@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -75,6 +76,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -83,7 +85,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
 import com.example.emuapp.api.apiCall
 import com.example.emuapp.api.dataOffline
-import com.example.emuapp.components.OutlinedButtons
+import com.example.emuapp.components.OutlinedCardView
 import com.example.emuapp.data.Dimensions
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
@@ -94,22 +96,19 @@ import com.example.emuapp.ui.theme.EmuAppTheme
 import kotlinx.coroutines.launch
 
 
-
 val allItems = apiCall()
-
 
 @Composable
 fun Home(modifier: Modifier = Modifier, navController: NavController) {
     val context  = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    if (InitialValues.error.value.isBlank()){
-      Toast.makeText(context, InitialValues.snackBarMessage.value, Toast.LENGTH_LONG).show()
-    }
+
+    InitialValues.fetchedItems = allItems
 
     Scaffold(
         modifier = Modifier
-            .padding(top = 28.dp, start = 10.dp, end = 10.dp, bottom = 28.dp),
+            .padding(top = Sizes.top, start = Sizes.start, end = Sizes.end, bottom = Sizes.bottom),
         topBar = { HomeTopBar() },
         bottomBar = {HomeBottomBar()},
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -128,19 +127,83 @@ fun Home(modifier: Modifier = Modifier, navController: NavController) {
             Spacer(Modifier.height(Sizes.spacer))
             Text(
                 text=InitialValues.error.value,
+                color = Color.Red.copy(0.5f),
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
             )
             Spacer(Modifier.height(Sizes.spacer))
-            OfferDisplay(items = allItems)
+            OfferDisplay(items = allItems, navController = navController)
             Spacer(Modifier.height(Sizes.spacer))
-            Featured(featuredItems = allItems)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text="Featured Items",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Black.copy(.8f)
+                )
+                TextButton(onClick = {
+                    navController.navigate(AllScreens.Items.route)
+                }) {
+                    Text(
+                        text="See All",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colorResource(R.color.primary)
+                    )
+                }
+            }
+            Featured(featuredItems = allItems, navController = navController)
             Spacer(Modifier.height(Sizes.spacer))
-            MostPopular(popularItems = allItems)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text="Most Popular Items",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Black.copy(.8f)
+                )
+                TextButton(onClick = {
+                    navController.navigate(AllScreens.Items.route)
+                }) {
+                    Text(
+                        text="See All",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colorResource(R.color.primary)
+                    )
+                }
+            }
+            MostPopular(popularItems = allItems, navController = navController)
             Spacer(Modifier.height(Sizes.spacer))
-            Electronics(electronicsItems = allItems)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text="Electronics",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Black.copy(.8f)
+                )
+                TextButton(onClick = {
+                    navController.navigate(AllScreens.Items.route)
+                }) {
+                    Text(
+                        text="See All",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colorResource(R.color.primary)
+                    )
+                }
+            }
+            Electronics(electronicsItems = allItems, navController = navController)
             Button(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.primary)
@@ -291,7 +354,10 @@ fun Search(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun OfferDisplay(modifier: Modifier=Modifier, items: ArrayList<Item>){
+fun OfferDisplay(modifier: Modifier=Modifier,
+                 items: ArrayList<Item>,
+                 navController: NavController
+){
     val height = LocalConfiguration.current.screenHeightDp.dp
     val width = LocalConfiguration.current.screenWidthDp.dp
     LazyRow (
@@ -317,20 +383,29 @@ fun OfferDisplay(modifier: Modifier=Modifier, items: ArrayList<Item>){
                         modifier = Modifier
                             .padding(start = Sizes.spacer)
                             .fillMaxHeight()
+                            .clickable {
+                                val itemParam = ArrayList<Item>()
+                                itemParam.add(it)
+                                navController.currentBackStackEntry?.savedStateHandle?.set("item", itemParam)
+                                navController.navigate(AllScreens.ItemView.route)
+
+                            }
                     ) {
                         Text(
-                            text = "Get Winter Offer",
+                            text = "Get Item Offer",
                             color = colorResource(R.color.white),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
-                            text = "20% Off",
+                            text = "${it.discountPercentage}% Off",
                             color = colorResource(R.color.white),
                             style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = "For Children",
+                            text = it.title,
                             color = colorResource(R.color.white),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -368,14 +443,17 @@ fun OfferDisplay(modifier: Modifier=Modifier, items: ArrayList<Item>){
 }
 
 @Composable
-fun Featured(modifier: Modifier = Modifier, featuredItems: ArrayList<Item>) {
+fun Featured(
+    modifier: Modifier = Modifier,
+    featuredItems: ArrayList<Item>,
+    navController: NavController) {
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(Sizes.spacer)
     ) {
         items(
             items =featuredItems.takeLast(30) , itemContent = {
-                OutlinedButtons(item = it)
+                OutlinedCardView(item = it, navController = navController)
             }
         )
     }
@@ -383,14 +461,17 @@ fun Featured(modifier: Modifier = Modifier, featuredItems: ArrayList<Item>) {
 }
 
 @Composable
-fun MostPopular(modifier: Modifier = Modifier, popularItems: ArrayList<Item>) {
+fun MostPopular(modifier: Modifier = Modifier,
+                popularItems: ArrayList<Item>,
+                navController: NavController
+) {
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(Sizes.spacer)
     ) {
         items(
             items = popularItems.take(30), itemContent = {
-                OutlinedButtons(item = it)
+                OutlinedCardView(item = it, navController = navController)
             }
         )
     }
@@ -398,7 +479,9 @@ fun MostPopular(modifier: Modifier = Modifier, popularItems: ArrayList<Item>) {
 }
 
 @Composable
-fun Electronics(modifier: Modifier = Modifier, electronicsItems: ArrayList<Item>) {
+fun Electronics(modifier: Modifier = Modifier,
+                electronicsItems: ArrayList<Item>,
+                navController: NavController) {
 
 
     LazyRow(
@@ -407,7 +490,7 @@ fun Electronics(modifier: Modifier = Modifier, electronicsItems: ArrayList<Item>
         items(
             items = electronicsItems, itemContent = {
                 if (it.category == "laptops" || it.category=="tablets" || it.category == "beauty") {
-                    OutlinedButtons(item=it)
+                    OutlinedCardView(item=it, navController = navController)
                 }
             }
         )

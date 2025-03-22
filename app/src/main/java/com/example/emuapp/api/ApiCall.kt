@@ -15,6 +15,38 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+fun singleItemViewOffline():Item{
+    val itemSample = Item(
+        id = 1,
+        title = "Sample",
+        description = "Detail-oriented and optimistic customer service representative, with over a \n" +
+                "year of professional experience assisting customers in solving complex \n" +
+                "issues. Keen to support your organization in becoming a market leader \n" +
+                "through proven customer support skills.",
+        category = "Sample",
+        price = 123.4,
+        discountPercentage = 5.4,
+        rating = 5.4,
+        stock = 12,
+        tags = listOf("be"),
+        brand = "Sample",
+        sku = "Sample",
+        weight = 34,
+        dimensions = Dimensions(23.4, 34.5, 434.4),
+        warrantyInformation = "Sample",
+        shippingInformation = "Sample",
+        availabilityStatus = "Sample",
+        reviews = listOf(Reviews(23, "4fdf", "4343", "rer", "ewew")),
+        returnPolicy = "kfjd",
+        minimumOrderQuantity = 34,
+        meta = Meta("rer", "rere", "ere", "re"),
+        thumbnail = "thumn",
+        images = listOf("fdfj","fjdkfjd")
+    )
+    return itemSample
+
+}
+
 fun dataOffline():ArrayList<Item>{
     val itemSample = Item(
         id = 1,
@@ -41,7 +73,7 @@ fun dataOffline():ArrayList<Item>{
         images = listOf("fdfj")
     )
     val allItems = ArrayList<Item>()
-    for (i in 1..10){
+    for (i in 1..100){
         allItems.add(itemSample)
     }
     return allItems

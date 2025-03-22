@@ -23,8 +23,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableDoubleState
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,25 +31,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
 import com.example.emuapp.data.Sizes
+import com.example.emuapp.screens.AllScreens
 
 @Composable
-fun OutlinedButtons(
-    modifier: Modifier=Modifier, item: Item
+fun OutlinedCardView(
+    modifier: Modifier=Modifier, item: Item, navController: NavController
 ) {
     val width = LocalConfiguration.current.screenWidthDp.dp
     val height = LocalConfiguration.current.screenHeightDp.dp
 
-    var fvIcon = remember { mutableStateOf(Icons.Default.FavoriteBorder) }
+    val fvIcon = remember { mutableStateOf(Icons.Default.FavoriteBorder) }
     val tint = remember { mutableStateOf(Color.Black.copy(.3f)) }
 
     OutlinedCard(
+        onClick = {
+            val itemParam = ArrayList<Item>()
+            itemParam.add(item)
+            navController.currentBackStackEntry?.savedStateHandle?.set("item", itemParam)
+            navController.navigate(AllScreens.ItemView.route)
+        },
         colors = CardDefaults.outlinedCardColors(
             containerColor = colorResource(R.color.white)
         ),
