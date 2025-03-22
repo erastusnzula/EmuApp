@@ -1,0 +1,75 @@
+package com.example.emuapp.api
+
+import android.widget.Toast
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.example.emuapp.R
+import com.example.emuapp.data.ApiItems
+import com.example.emuapp.data.Dimensions
+import com.example.emuapp.data.InitialValues
+import com.example.emuapp.data.Item
+import com.example.emuapp.data.Meta
+import com.example.emuapp.data.Reviews
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+fun dataOffline():ArrayList<Item>{
+    val itemSample = Item(
+        id = 1,
+        title = "Sample",
+        description = "Sample",
+        category = "Sample",
+        price = 123.4,
+        discountPercentage = 5.4,
+        rating = 5.4,
+        stock = 12,
+        tags = listOf("be"),
+        brand = "Sample",
+        sku = "Sample",
+        weight = 34,
+        dimensions = Dimensions(23.4, 34.5, 434.4),
+        warrantyInformation = "Sample",
+        shippingInformation = "Sample",
+        availabilityStatus = "Sample",
+        reviews = listOf(Reviews(23, "4fdf", "4343", "rer", "ewew")),
+        returnPolicy = "kfjd",
+        minimumOrderQuantity = 34,
+        meta = Meta("rer", "rere", "ere", "re"),
+        thumbnail = "thumn",
+        images = listOf("fdfj")
+    )
+    val allItems = ArrayList<Item>()
+    for (i in 1..10){
+        allItems.add(itemSample)
+    }
+    return allItems
+}
+
+
+fun apiCall() :ArrayList<Item> {
+    val allItems = ArrayList<Item>()
+    val call = ApiClient.apiService.getData(limit = 200)
+    call.enqueue(object : Callback<ApiItems> {
+        override fun onResponse(p0: Call<ApiItems>, p1: Response<ApiItems>) {
+            if (p1.isSuccessful) {
+                InitialValues.error.value = ""
+                InitialValues.snackBarMessage.value = "Data successfully fetched."
+                allItems.clear()
+                p1.body()?.products?.forEach {
+                    allItems.add(it)
+                }
+            }
+            else{
+                InitialValues.error.value = "failed"
+            }
+        }
+
+        override fun onFailure(p0: Call<ApiItems>, p1: Throwable) {
+            InitialValues.error.value = p1.message.toString()
+        }
+
+    })
+    return allItems
+}
