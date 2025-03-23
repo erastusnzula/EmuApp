@@ -3,7 +3,7 @@ package com.example.emuapp.data
 import androidx.compose.ui.unit.dp
 
 object Sizes {
-    val topLeft = 60.dp
+    val topLeft = 50.dp
     val icon = 28.dp
     val borderRadius = 14.5.dp
     val elevation = 10.dp

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,6 +55,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
 import com.example.emuapp.api.singleItemViewOffline
+import com.example.emuapp.components.Review
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
 import com.example.emuapp.data.Sizes
@@ -108,8 +111,9 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                     containerColor = colorResource(R.color.white)
                 ),
                 modifier = Modifier
-                    .width(width-20.dp)
-                    .height(height/3),
+                    .width(width-50.dp)
+                    .height(height/3)
+                    .align(Alignment.CenterHorizontally),
                 //shape = RoundedCornerShape(Sizes.borderRadius),
                 elevation = CardDefaults.outlinedCardElevation(
                     defaultElevation =0.dp
@@ -179,8 +183,8 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                             ),
                             modifier = Modifier
                                 .padding(5.dp)
-                                .width(width/2-20.dp)
-                                .height(height/5),
+                                .width(width/3)
+                                .height(height/7),
                             //shape = RoundedCornerShape(Sizes.borderRadius),
                             elevation = CardDefaults.outlinedCardElevation(
                                 defaultElevation = 0.dp
@@ -226,13 +230,16 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                 ),
                 border = BorderStroke(1.dp, Color.Blue.copy(.1f))
             ) {
+
                 Column(
 
                     verticalArrangement = Arrangement.spacedBy(Sizes.spacer),
                     modifier = Modifier
+                        .background(colorResource(R.color.white))
                         .fillMaxSize()
                         .padding(8.dp)
                 ) {
+                    Spacer(Modifier.height(5.dp))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -245,14 +252,6 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                             modifier = Modifier
                                 .width(width/2-30.dp)
                         ){
-                            Text(
-                                text = "Name: ",
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Medium,
-
-                            )
                             Text(
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1,
@@ -273,20 +272,21 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                                 text = "Category: ",
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1,
-                                fontSize = 20.sp,
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Medium
                             )
                             Text(
                                 overflow = TextOverflow.Ellipsis,
                                 maxLines = 1,
                                 text = item[0].category,
-                                fontSize = 18.sp,
+                                fontSize = 16.sp,
                                 color = colorResource(R.color.primary),
                                 modifier = Modifier
                                     .horizontalScroll(rememberScrollState())
                             )
                         }
                     }
+                    Spacer(Modifier.height(5.dp))
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -316,6 +316,8 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                         ){
                             for (star in 1 .. item[0].rating.toInt()){
                                 Icon(
+                                    modifier = Modifier
+                                        .size(15.dp),
                                     imageVector = Icons.Default.Star,
                                     contentDescription = null,
                                     tint = colorResource(R.color.primary)
@@ -324,6 +326,8 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
 
                         }
                     }
+                    Spacer(Modifier.height(5.dp))
+
                     Column (
                        horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.Center,
@@ -344,6 +348,8 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                     }
 
                 }
+
+                Review(reviews = item[0].reviews)
 
                 Button(
                     colors = ButtonDefaults.buttonColors(

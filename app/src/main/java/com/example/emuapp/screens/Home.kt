@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,19 +24,34 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContactPage
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerDefaults
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -43,6 +59,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +72,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +89,8 @@ import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
 import com.example.emuapp.data.Sizes
 import com.example.emuapp.ui.theme.EmuAppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 
 val allItems = apiCall()
@@ -81,119 +101,272 @@ fun Home(navController: NavController) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    SnackbarHost(hostState = SnackbarHostState(), modifier = Modifier, snackbar = {
-        InitialValues.snackBarMessage.value
-    })
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     InitialValues.fetchedItems = allItems
 
-    Scaffold(
-        modifier = Modifier
-            .padding(top = Sizes.top, start = Sizes.start, end = Sizes.end, bottom = Sizes.bottom),
-        topBar = { HomeTopBar() },
-        bottomBar = { HomeBottomBar() },
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-        containerColor = Color.White,
-        contentColor = Color.Black,
-        contentWindowInsets = WindowInsets.systemBars,
-    ) { innerPadding ->
-        Column(
-            verticalArrangement = Arrangement.SpaceBetween,
+    ModalNavigationDrawer(
+        drawerContent = {
+            ModalDrawerSheet(
+                modifier = Modifier,
+                drawerShape = DrawerDefaults.shape,
+                drawerContainerColor = Color.White,
+                windowInsets = WindowInsets.systemBars
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(top=20.dp)
+                        .padding(10.dp),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center,
+                    ){
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = null,
+                            tint = colorResource(R.color.primary),
+                            modifier = Modifier
+                                .padding(top = 10.dp)
+                                .size(100.dp).clip(CircleShape)
+
+                        )
+                        Icon(
+                            imageVector = Icons.Default.AttachFile,
+                            contentDescription = null,
+                            tint = colorResource(R.color.primary),
+                            modifier = Modifier
+                                .padding(start = 120.dp, bottom = 80.dp)
+                        )
+                    }
+                    NavigationDrawerItem(
+                        label = {
+                            Text(
+                                text = "Account Details"
+                            )
+                        },
+                        selected = false,
+                        onClick = {
+                            navController.navigate(AllScreens.Profile.route)
+                        },
+                        modifier = Modifier,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.AccountBox,
+                                contentDescription = null
+                            )
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = NavigationDrawerItemDefaults.colors(
+                            unselectedContainerColor = colorResource(R.color.primary).copy(.4f),
+                            unselectedIconColor = colorResource(R.color.primary)
+                        ),
+                    )
+                    Spacer(Modifier.height(Sizes.spacer))
+                    NavigationDrawerItem(
+                        label = {
+                            Text(
+                                text = "Settings"
+                            )
+                        },
+                        selected = false,
+                        onClick = {
+                            navController.navigate(AllScreens.Settings.route)
+                        },
+                        modifier = Modifier,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = null
+                            )
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = NavigationDrawerItemDefaults.colors(
+                            unselectedContainerColor = colorResource(R.color.primary).copy(.4f),
+                            unselectedIconColor = colorResource(R.color.primary)
+                        ),
+                    )
+                    Spacer(Modifier.height(Sizes.spacer))
+                    NavigationDrawerItem(
+                        label = {
+                            Text(
+                                text = "FAQs"
+                            )
+                        },
+                        selected = false,
+                        onClick = {
+                            navController.navigate(AllScreens.FAQ.route)
+                        },
+                        modifier = Modifier,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null
+                            )
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = NavigationDrawerItemDefaults.colors(
+                            unselectedContainerColor = colorResource(R.color.primary).copy(.4f),
+                            unselectedIconColor = colorResource(R.color.primary)
+                        ),
+                    )
+                    Spacer(Modifier.height(Sizes.spacer))
+                    NavigationDrawerItem(
+                        label = {
+                            Text(
+                                text = "Contact"
+                            )
+                        },
+                        selected = false,
+                        onClick = {
+                            navController.navigate(AllScreens.Contact.route)
+                        },
+                        modifier = Modifier,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.ContactPage,
+                                contentDescription = null
+                            )
+                        },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = NavigationDrawerItemDefaults.colors(
+                            unselectedContainerColor = colorResource(R.color.primary).copy(.4f),
+                            unselectedIconColor = colorResource(R.color.primary)
+                        ),
+                    )
+                    Spacer(Modifier.height(Sizes.spacer))
+                    Button(
+                        shape = RoundedCornerShape(10.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorResource(R.color.primary).copy(.6f)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        onClick = {
+
+                    }) {
+                        Text(
+                            text = "Log Out",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+
+                }
+            }
+        },
+        modifier = Modifier,
+        drawerState = drawerState,
+        gesturesEnabled = true,
+        scrimColor = Color.Blue.copy(.2f)
+    ) {
+        Scaffold(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Search()
-            Spacer(Modifier.height(Sizes.spacer))
-            Text(
-                text = InitialValues.error.value,
-                color = Color.Red.copy(0.5f),
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
+                .padding(top = Sizes.top, start = Sizes.start, end = Sizes.end, bottom = Sizes.bottom),
+            topBar = { HomeTopBar(scope=scope, drawerState = drawerState, navController=navController) },
+            bottomBar = { HomeBottomBar(navController=navController) },
+            snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+            containerColor = Color.White,
+            contentColor = Color.Black,
+            contentWindowInsets = WindowInsets.systemBars,
+        ) { innerPadding ->
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
-                    .fillMaxWidth()
-            )
-            Spacer(Modifier.height(Sizes.spacer))
-            OfferDisplay(items = allItems, navController = navController)
-            Spacer(Modifier.height(Sizes.spacer))
-            if (allItems.size != 0) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Search()
+                Spacer(Modifier.height(Sizes.spacer))
+                Text(
+                    text = InitialValues.error.value,
+                    color = Color.Red.copy(0.5f),
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Featured Items",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.Black.copy(.8f)
-                    )
-                    TextButton(onClick = {
-                        navController.navigate(AllScreens.Items.route)
-                    }) {
+                )
+                Spacer(Modifier.height(Sizes.spacer))
+                OfferDisplay(items = allItems, navController = navController)
+                Spacer(Modifier.height(Sizes.spacer))
+                if (allItems.size != 0) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
                         Text(
-                            text = "See All",
+                            text = "Featured Items",
                             style = MaterialTheme.typography.titleMedium,
-                            color = colorResource(R.color.primary)
+                            color = Color.Black.copy(.8f)
                         )
+                        TextButton(onClick = {
+                            navController.navigate(AllScreens.Items.route)
+                        }) {
+                            Text(
+                                text = "See All",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colorResource(R.color.primary)
+                            )
+                        }
                     }
                 }
-            }
-            Featured(featuredItems = allItems, navController = navController)
-            Spacer(Modifier.height(Sizes.spacer))
-            if (allItems.size != 0) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Most Popular Items",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.Black.copy(.8f)
-                    )
-                    TextButton(onClick = {
-                        navController.navigate(AllScreens.Items.route)
-                    }) {
+                Featured(featuredItems = allItems, navController = navController)
+                Spacer(Modifier.height(Sizes.spacer))
+                if (allItems.size != 0) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
                         Text(
-                            text = "See All",
+                            text = "Most Popular Items",
                             style = MaterialTheme.typography.titleMedium,
-                            color = colorResource(R.color.primary)
+                            color = Color.Black.copy(.8f)
                         )
+                        TextButton(onClick = {
+                            navController.navigate(AllScreens.Items.route)
+                        }) {
+                            Text(
+                                text = "See All",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colorResource(R.color.primary)
+                            )
+                        }
                     }
                 }
-            }
-            MostPopular(popularItems = allItems, navController = navController)
-            Spacer(Modifier.height(Sizes.spacer))
-            if (allItems.size != 0) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Electronics",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.Black.copy(.8f)
-                    )
-                    TextButton(onClick = {
-                        navController.navigate(AllScreens.Items.route)
-                    }) {
+                MostPopular(popularItems = allItems, navController = navController)
+                Spacer(Modifier.height(Sizes.spacer))
+                if (allItems.size != 0) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
                         Text(
-                            text = "See All",
+                            text = "Electronics",
                             style = MaterialTheme.typography.titleMedium,
-                            color = colorResource(R.color.primary)
+                            color = Color.Black.copy(.8f)
                         )
+                        TextButton(onClick = {
+                            navController.navigate(AllScreens.Items.route)
+                        }) {
+                            Text(
+                                text = "See All",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = colorResource(R.color.primary)
+                            )
+                        }
                     }
                 }
-            }
-            Electronics(
-                electronicsItems = allItemsByCategory,
-                navController = navController
-            )
+                Electronics(
+                    electronicsItems = allItemsByCategory,
+                    navController = navController
+                )
 //            Button(
 //                colors = ButtonDefaults.buttonColors(
 //                    containerColor = colorResource(R.color.primary)
@@ -205,14 +378,15 @@ fun Home(navController: NavController) {
 //                }) {
 //                Text("Show")
 //            }
-        }
+            }
 
+        }
     }
 }
 
 
 @Composable
-fun HomeTopBar(modifier: Modifier = Modifier) {
+fun HomeTopBar(scope:CoroutineScope, drawerState: DrawerState, navController: NavController) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -228,10 +402,16 @@ fun HomeTopBar(modifier: Modifier = Modifier) {
                 modifier = Modifier
                     .size(Sizes.topLeft)
                     .clip(CircleShape),
-                onClick = {}
+                onClick = {
+                    scope.launch {
+                        drawerState.apply {
+                            if (isClosed) open() else close()
+                        }
+                    }
+                }
             ) {
                 Icon(
-                    imageVector = Icons.Default.AccountCircle,
+                    imageVector = InitialValues.topBarIcon.value,
                     contentDescription = null,
                     tint = colorResource(R.color.primary),
                     modifier = Modifier
@@ -250,6 +430,9 @@ fun HomeTopBar(modifier: Modifier = Modifier) {
             tint = colorResource(R.color.primary),
             modifier = Modifier
                 .size(Sizes.icon)
+                .clickable {
+                    navController.navigate(AllScreens.Notifications.route)
+                }
         )
 
     }
@@ -257,16 +440,18 @@ fun HomeTopBar(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HomeBottomBar(modifier: Modifier = Modifier) {
+fun HomeBottomBar(navController: NavController) {
 
     Row(
         modifier = Modifier
-            .padding(bottom = 10.dp)
+            .padding(bottom = 15.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = {}) {
+        IconButton(onClick = {
+            navController.navigate(AllScreens.Home.route)
+        }) {
             Icon(
                 imageVector = Icons.Filled.Home,
                 contentDescription = null,
@@ -275,7 +460,9 @@ fun HomeBottomBar(modifier: Modifier = Modifier) {
                     .size(Sizes.icon)
             )
         }
-        IconButton(onClick = {}) {
+        IconButton(onClick = {
+            navController.navigate(AllScreens.Settings.route)
+        }) {
             Icon(
                 imageVector = Icons.Filled.Settings,
                 contentDescription = null,
@@ -284,7 +471,9 @@ fun HomeBottomBar(modifier: Modifier = Modifier) {
                     .size(Sizes.icon)
             )
         }
-        IconButton(onClick = {}) {
+        IconButton(onClick = {
+            navController.navigate(AllScreens.Profile.route)
+        }) {
             Icon(
                 imageVector = Icons.Filled.Person,
                 contentDescription = null,
@@ -307,7 +496,7 @@ fun Search(modifier: Modifier = Modifier) {
     val searchOutPut = searchList.filter { it.contains(searchQuery.value, ignoreCase = true) }
     SearchBar(
         colors = SearchBarDefaults.colors(
-            containerColor = colorResource(R.color.primary).copy(.2f)
+            containerColor = colorResource(R.color.primary).copy(.1f)
         ),
         query = searchQuery.value,
         onQueryChange = { },
@@ -390,7 +579,9 @@ fun OfferDisplay(
                             }
                     ) {
                         Text(
-                            text = "Item on Offer",
+                            text = it.title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             color = colorResource(R.color.white),
                             style = MaterialTheme.typography.titleMedium
                         )
@@ -400,7 +591,7 @@ fun OfferDisplay(
                             style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = it.title,
+                            text = "${it.stock} left",
                             color = colorResource(R.color.white),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,

@@ -110,7 +110,7 @@ fun Items(navController: NavController) {
                                 navController.navigate(AllScreens.ItemView.route)
                             },
                             colors = CardDefaults.outlinedCardColors(
-                                containerColor = colorResource(R.color.white)
+                                containerColor = colorResource(R.color.primary).copy(.1f)
                             ),
                             modifier = Modifier
                                 .width(width/2-20.dp)

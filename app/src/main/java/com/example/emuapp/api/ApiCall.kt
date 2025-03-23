@@ -14,10 +14,7 @@ fun singleItemViewOffline():Item{
     val itemSample = Item(
         id = 1,
         title = "Sampleflgldkldjgdgj",
-        description = "Detail-oriented and optimistic customer service representative, with over a \n" +
-                "year of professional experience assisting customers in solving complex \n" +
-                "issues. Keen to support your organization in becoming a market leader \n" +
-                "through proven customer support skills.",
+        description = "Detail-oriented and optimistic customer service",
         category = "Samplecjfkdjgdggdg",
         price = 123.4,
         discountPercentage = 5.4,

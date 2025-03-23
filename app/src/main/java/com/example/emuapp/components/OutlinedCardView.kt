@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -56,11 +57,11 @@ fun OutlinedCardView(
             navController.navigate(AllScreens.ItemView.route)
         },
         colors = CardDefaults.outlinedCardColors(
-            containerColor = colorResource(R.color.white)
+            containerColor = colorResource(R.color.primary).copy(.1f)
         ),
         modifier = Modifier
             .width(width/2-20.dp)
-            .height(height/4),
+            .height(height/5),
         elevation = CardDefaults.outlinedCardElevation(
             defaultElevation = 0.dp
         ),
