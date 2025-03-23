@@ -1,10 +1,5 @@
 package com.example.emuapp.api
 
-import android.widget.Toast
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import com.example.emuapp.R
 import com.example.emuapp.data.ApiItems
 import com.example.emuapp.data.Dimensions
 import com.example.emuapp.data.InitialValues
@@ -18,12 +13,12 @@ import retrofit2.Response
 fun singleItemViewOffline():Item{
     val itemSample = Item(
         id = 1,
-        title = "Sample",
+        title = "Sampleflgldkldjgdgj",
         description = "Detail-oriented and optimistic customer service representative, with over a \n" +
                 "year of professional experience assisting customers in solving complex \n" +
                 "issues. Keen to support your organization in becoming a market leader \n" +
                 "through proven customer support skills.",
-        category = "Sample",
+        category = "Samplecjfkdjgdggdg",
         price = 123.4,
         discountPercentage = 5.4,
         rating = 5.4,
@@ -40,7 +35,7 @@ fun singleItemViewOffline():Item{
         returnPolicy = "kfjd",
         minimumOrderQuantity = 34,
         meta = Meta("rer", "rere", "ere", "re"),
-        thumbnail = "thumn",
+        thumbnail = "R.drawable.ic_launcher_background",
         images = listOf("fdfj","fjdkfjd")
     )
     return itemSample
@@ -52,7 +47,7 @@ fun dataOffline():ArrayList<Item>{
         id = 1,
         title = "Sample",
         description = "Sample",
-        category = "Sample",
+        category = "laptops",
         price = 123.4,
         discountPercentage = 5.4,
         rating = 5.4,
@@ -87,6 +82,32 @@ fun apiCall() :ArrayList<Item> {
         override fun onResponse(p0: Call<ApiItems>, p1: Response<ApiItems>) {
             if (p1.isSuccessful) {
                 InitialValues.error.value = ""
+                InitialValues.snackBarMessage.value = "Data successfully fetched."
+                allItems.clear()
+                p1.body()?.products?.forEach {
+                    allItems.add(it)
+                }
+            }
+            else{
+                InitialValues.error.value = "failed"
+            }
+        }
+
+        override fun onFailure(p0: Call<ApiItems>, p1: Throwable) {
+            InitialValues.error.value = p1.message.toString()
+        }
+
+    })
+    return allItems
+}
+
+fun apiCallByCategory() :ArrayList<Item> {
+    val allItems = ArrayList<Item>()
+    val call = ApiClient.apiService.getDataByCategory(limit = 200)
+    call.enqueue(object : Callback<ApiItems> {
+        override fun onResponse(p0: Call<ApiItems>, p1: Response<ApiItems>) {
+            if (p1.isSuccessful) {
+//                InitialValues.error.value = ""
                 InitialValues.snackBarMessage.value = "Data successfully fetched."
                 allItems.clear()
                 p1.body()?.products?.forEach {

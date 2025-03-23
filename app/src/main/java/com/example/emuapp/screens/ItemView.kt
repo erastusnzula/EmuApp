@@ -2,6 +2,8 @@ package com.example.emuapp.screens
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,12 +18,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -31,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,10 +42,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
@@ -63,6 +66,7 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
     ) {innerPadding->
         Column(
             modifier = Modifier
+                .background(colorResource(R.color.white))
                 .padding(innerPadding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
@@ -72,7 +76,7 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
 
 
             Row(
-                horizontalArrangement = Arrangement.spacedBy(width/4),
+                horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier=Modifier
                     .fillMaxWidth()
@@ -120,7 +124,7 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                     Box(
                         modifier=Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(.8f)
+                            .fillMaxHeight()
                     ) {
                         val fvIcon = remember { mutableStateOf(Icons.Default.FavoriteBorder) }
                         val tint = remember { mutableStateOf(Color.Black.copy(.3f)) }
@@ -158,8 +162,6 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                     }
                 }
             }
-            Spacer(Modifier.height(Sizes.spacer))
-
 
             LazyRow(
                 horizontalArrangement = Arrangement.Center,
@@ -193,40 +195,15 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                                 Box(
                                     modifier=Modifier
                                         .fillMaxWidth()
-                                        .fillMaxHeight(.8f)
+                                        .fillMaxHeight()
                                 ) {
-                                    val fvIcon = remember { mutableStateOf(Icons.Default.FavoriteBorder) }
-                                    val tint = remember { mutableStateOf(Color.Black.copy(.3f)) }
                                     Image(
-                                        painter = rememberAsyncImagePainter(item[0].thumbnail),
+                                        painter = rememberAsyncImagePainter(it),
                                         contentScale = ContentScale.FillBounds,
                                         contentDescription = null,
                                         modifier = Modifier
                                             .fillMaxSize()
                                     )
-                                    IconButton(
-                                        modifier = Modifier
-                                            .align(Alignment.TopEnd),
-                                        onClick = {
-                                            if (item[0] in InitialValues.favouriteList){
-                                                InitialValues.favouriteList.remove(item[0])
-                                                fvIcon.value = Icons.Default.FavoriteBorder
-                                                tint.value = Color.Black.copy(.3f)
-                                            }else{
-                                                InitialValues.favouriteList.add(item[0])
-                                                fvIcon.value = Icons.Default.Favorite
-                                                tint.value = Color.Red
-
-
-                                            }
-                                        }) {
-                                        Icon(
-                                            imageVector = fvIcon.value,
-                                            contentDescription = null,
-                                            tint = tint.value,
-                                            modifier = Modifier
-                                        )
-                                    }
 
                                 }
                             }
@@ -256,41 +233,96 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                         .fillMaxSize()
                         .padding(8.dp)
                 ) {
-                    Row (
-                        horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
-                        verticalAlignment = Alignment.CenterVertically,
+                    Row(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ){
-                        Text(
-                            text = "Name: ",
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-                        Text(
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                            text = item[0].title,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = colorResource(R.color.primary)
-                        )
+                        Row (
+                            horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .width(width/2-30.dp)
+                        ){
+                            Text(
+                                text = "Name: ",
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium,
+
+                            )
+                            Text(
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                                text = item[0].title,
+                                fontSize = 18.sp,
+                                color = colorResource(R.color.primary),
+                                modifier = Modifier
+                                    .horizontalScroll(rememberScrollState())
+                            )
+                        }
+                        Spacer(Modifier.width(5.dp))
+                        Row (
+                            horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                        ){
+                            Text(
+                                text = "Category: ",
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                                text = item[0].category,
+                                fontSize = 18.sp,
+                                color = colorResource(R.color.primary),
+                                modifier = Modifier
+                                    .horizontalScroll(rememberScrollState())
+                            )
+                        }
                     }
-                    Row (
-                        horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
-                        verticalAlignment = Alignment.CenterVertically,
+                    Row(
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ){
-                        Text(
-                            text = "Price: ",
-                            style = MaterialTheme.typography.headlineMedium
-                        )
-                        Text(
-                            text = "$${item[0].price}",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = colorResource(R.color.primary)
-                        )
+                        Row (
+                            horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                        ){
+                            Text(
+                                text = "Price: ",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "$${item[0].price}",
+                                fontSize = 18.sp,
+                                color = colorResource(R.color.primary)
+                            )
+                        }
+                        Row (
+                            horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                        ){
+                            for (star in 1 .. item[0].rating.toInt()){
+                                Icon(
+                                    imageVector = Icons.Default.Star,
+                                    contentDescription = null,
+                                    tint = colorResource(R.color.primary)
+                                )
+                            }
+
+                        }
                     }
                     Column (
                        horizontalAlignment = Alignment.Start,
@@ -299,16 +331,15 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                             .fillMaxWidth()
                     ){
                         Text(
-                            text = "Description: ",
-                            style = MaterialTheme.typography.headlineMedium
+                            text = "Description",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = item[0].description,
                             textAlign = TextAlign.Justify,
-                            //style = MaterialTheme.typography.titleLarge,
-                            color = colorResource(R.color.primary),
-                            modifier = Modifier
-                                .fillMaxWidth()
+                            fontSize = 16.sp,
+                            color = Color.Black.copy(.8f),
                         )
                     }
 
@@ -334,14 +365,14 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
         }
     }
 }
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun ItemPreview(){
-//    EmuAppTheme {
-//        ItemView(
-//            navController = rememberNavController(),
-//            item = arrayListOf<Item>(singleItemViewOffline())
-//        )
-//    }
-//}
+
+@Preview(showBackground = true)
+@Composable
+fun ItemPreview(){
+    EmuAppTheme {
+        ItemView(
+            navController = rememberNavController(),
+            item = arrayListOf<Item>(singleItemViewOffline())
+        )
+    }
+}

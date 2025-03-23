@@ -1,15 +1,10 @@
 package com.example.emuapp.screens
 
-import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -22,14 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PageSize
-import androidx.compose.foundation.pager.PagerDefaults
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,26 +26,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Circle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -74,7 +55,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -84,25 +64,26 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
 import com.example.emuapp.api.apiCall
+import com.example.emuapp.api.apiCallByCategory
 import com.example.emuapp.api.dataOffline
 import com.example.emuapp.components.OutlinedCardView
-import com.example.emuapp.data.Dimensions
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
-import com.example.emuapp.data.Meta
-import com.example.emuapp.data.Reviews
 import com.example.emuapp.data.Sizes
 import com.example.emuapp.ui.theme.EmuAppTheme
-import kotlinx.coroutines.launch
 
 
 val allItems = apiCall()
+val allItemsByCategory = apiCallByCategory()
 
 @Composable
-fun Home(modifier: Modifier = Modifier, navController: NavController) {
-    val context  = LocalContext.current
+fun Home(navController: NavController) {
+    val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    SnackbarHost(hostState = SnackbarHostState(), modifier = Modifier, snackbar = {
+        InitialValues.snackBarMessage.value
+    })
 
     InitialValues.fetchedItems = allItems
 
@@ -110,7 +91,7 @@ fun Home(modifier: Modifier = Modifier, navController: NavController) {
         modifier = Modifier
             .padding(top = Sizes.top, start = Sizes.start, end = Sizes.end, bottom = Sizes.bottom),
         topBar = { HomeTopBar() },
-        bottomBar = {HomeBottomBar()},
+        bottomBar = { HomeBottomBar() },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         containerColor = Color.White,
         contentColor = Color.Black,
@@ -126,7 +107,7 @@ fun Home(modifier: Modifier = Modifier, navController: NavController) {
             Search()
             Spacer(Modifier.height(Sizes.spacer))
             Text(
-                text=InitialValues.error.value,
+                text = InitialValues.error.value,
                 color = Color.Red.copy(0.5f),
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
@@ -136,90 +117,98 @@ fun Home(modifier: Modifier = Modifier, navController: NavController) {
             Spacer(Modifier.height(Sizes.spacer))
             OfferDisplay(items = allItems, navController = navController)
             Spacer(Modifier.height(Sizes.spacer))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text="Featured Items",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.Black.copy(.8f)
-                )
-                TextButton(onClick = {
-                    navController.navigate(AllScreens.Items.route)
-                }) {
+            if (allItems.size != 0) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     Text(
-                        text="See All",
+                        text = "Featured Items",
                         style = MaterialTheme.typography.titleMedium,
-                        color = colorResource(R.color.primary)
+                        color = Color.Black.copy(.8f)
                     )
+                    TextButton(onClick = {
+                        navController.navigate(AllScreens.Items.route)
+                    }) {
+                        Text(
+                            text = "See All",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = colorResource(R.color.primary)
+                        )
+                    }
                 }
             }
             Featured(featuredItems = allItems, navController = navController)
             Spacer(Modifier.height(Sizes.spacer))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text="Most Popular Items",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.Black.copy(.8f)
-                )
-                TextButton(onClick = {
-                    navController.navigate(AllScreens.Items.route)
-                }) {
+            if (allItems.size != 0) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     Text(
-                        text="See All",
+                        text = "Most Popular Items",
                         style = MaterialTheme.typography.titleMedium,
-                        color = colorResource(R.color.primary)
+                        color = Color.Black.copy(.8f)
                     )
+                    TextButton(onClick = {
+                        navController.navigate(AllScreens.Items.route)
+                    }) {
+                        Text(
+                            text = "See All",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = colorResource(R.color.primary)
+                        )
+                    }
                 }
             }
             MostPopular(popularItems = allItems, navController = navController)
             Spacer(Modifier.height(Sizes.spacer))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text="Electronics",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.Black.copy(.8f)
-                )
-                TextButton(onClick = {
-                    navController.navigate(AllScreens.Items.route)
-                }) {
+            if (allItems.size != 0) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     Text(
-                        text="See All",
+                        text = "Electronics",
                         style = MaterialTheme.typography.titleMedium,
-                        color = colorResource(R.color.primary)
+                        color = Color.Black.copy(.8f)
                     )
+                    TextButton(onClick = {
+                        navController.navigate(AllScreens.Items.route)
+                    }) {
+                        Text(
+                            text = "See All",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = colorResource(R.color.primary)
+                        )
+                    }
                 }
             }
-            Electronics(electronicsItems = allItems, navController = navController)
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(R.color.primary)
-                ),
-                onClick = {
-                    scope.launch {
-                        snackBarHostState.showSnackbar("Snack Bar")
-                    }
-                }) {
-                Text("Show")
-            }
+            Electronics(
+                electronicsItems = allItemsByCategory,
+                navController = navController
+            )
+//            Button(
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = colorResource(R.color.primary)
+//                ),
+//                onClick = {
+//                    scope.launch {
+//                        snackBarHostState.showSnackbar("Snack Bar")
+//                    }
+//                }) {
+//                Text("Show")
+//            }
         }
 
     }
 }
-
 
 
 @Composable
@@ -268,13 +257,15 @@ fun HomeTopBar(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun HomeBottomBar(modifier: Modifier=Modifier){
-    Row (
-        modifier=Modifier
+fun HomeBottomBar(modifier: Modifier = Modifier) {
+
+    Row(
+        modifier = Modifier
+            .padding(bottom = 10.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
-    ){
+    ) {
         IconButton(onClick = {}) {
             Icon(
                 imageVector = Icons.Filled.Home,
@@ -304,6 +295,7 @@ fun HomeBottomBar(modifier: Modifier=Modifier){
         }
 
     }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -314,13 +306,17 @@ fun Search(modifier: Modifier = Modifier) {
     val searchList = listOf("bananas", "beans", "carrots")
     val searchOutPut = searchList.filter { it.contains(searchQuery.value, ignoreCase = true) }
     SearchBar(
+        colors = SearchBarDefaults.colors(
+            containerColor = colorResource(R.color.primary).copy(.2f)
+        ),
         query = searchQuery.value,
         onQueryChange = { },
-        onSearch = {  },
+        onSearch = { },
         active = active.value,
-        onActiveChange = {  },
+        onActiveChange = { },
         modifier = Modifier
             .fillMaxWidth(),
+        //.border(width = 1.dp, color = colorResource(R.color.primary), shape = RoundedCornerShape(10.dp)),
         placeholder = { Text(text = "Search here") },
         leadingIcon = {
             Icon(
@@ -339,7 +335,6 @@ fun Search(modifier: Modifier = Modifier) {
             }
         },
         shape = RoundedCornerShape(Sizes.borderRadius),
-        colors = SearchBarDefaults.colors(),
         tonalElevation = 0.dp,
         windowInsets = WindowInsets.systemBars,
     ) {
@@ -354,25 +349,25 @@ fun Search(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun OfferDisplay(modifier: Modifier=Modifier,
-                 items: ArrayList<Item>,
-                 navController: NavController
-){
+fun OfferDisplay(
+    items: ArrayList<Item>,
+    navController: NavController
+) {
     val height = LocalConfiguration.current.screenHeightDp.dp
     val width = LocalConfiguration.current.screenWidthDp.dp
-    LazyRow (
+    LazyRow(
         horizontalArrangement = Arrangement.spacedBy(Sizes.spacer)
-    ){
+    ) {
         items(
             items = items.takeLast(5),
             itemContent = {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier=Modifier
-                        .width(width-20.dp)
+                    modifier = Modifier
+                        .width(width - 20.dp)
                         .clip(RoundedCornerShape(Sizes.borderRadius))
-                        .height(height/6)
+                        .height(height / 6)
                         .background(colorResource(R.color.primary))
 
 
@@ -386,13 +381,16 @@ fun OfferDisplay(modifier: Modifier=Modifier,
                             .clickable {
                                 val itemParam = ArrayList<Item>()
                                 itemParam.add(it)
-                                navController.currentBackStackEntry?.savedStateHandle?.set("item", itemParam)
+                                navController.currentBackStackEntry?.savedStateHandle?.set(
+                                    "item",
+                                    itemParam
+                                )
                                 navController.navigate(AllScreens.ItemView.route)
 
                             }
                     ) {
                         Text(
-                            text = "Get Item Offer",
+                            text = "Item on Offer",
                             color = colorResource(R.color.white),
                             style = MaterialTheme.typography.titleMedium
                         )
@@ -415,7 +413,17 @@ fun OfferDisplay(modifier: Modifier=Modifier,
                         contentDescription = "",
                         modifier = Modifier
                             .fillMaxHeight()
-                            .clip(RoundedCornerShape(Sizes.borderRadius)),
+                            .clip(RoundedCornerShape(Sizes.borderRadius))
+                            .clickable {
+                                val itemParam = ArrayList<Item>()
+                                itemParam.add(it)
+                                navController.currentBackStackEntry?.savedStateHandle?.set(
+                                    "item",
+                                    itemParam
+                                )
+                                navController.navigate(AllScreens.ItemView.route)
+
+                            },
                         contentScale = ContentScale.FillHeight
                     )
                 }
@@ -434,25 +442,26 @@ fun OfferDisplay(modifier: Modifier=Modifier,
             Icon(
                 imageVector = Icons.Filled.Circle,
                 contentDescription = null,
-                tint = colorResource(R.color.primary)
+                tint = colorResource(R.color.primary),
+                modifier = Modifier
+                    .size(10.dp)
             )
         }
 
     }
-    Spacer(Modifier.height(Sizes.spacer))
 }
 
 @Composable
 fun Featured(
-    modifier: Modifier = Modifier,
     featuredItems: ArrayList<Item>,
-    navController: NavController) {
+    navController: NavController
+) {
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(Sizes.spacer)
     ) {
         items(
-            items =featuredItems.takeLast(30) , itemContent = {
+            items = featuredItems.takeLast(30), itemContent = {
                 OutlinedCardView(item = it, navController = navController)
             }
         )
@@ -461,9 +470,9 @@ fun Featured(
 }
 
 @Composable
-fun MostPopular(modifier: Modifier = Modifier,
-                popularItems: ArrayList<Item>,
-                navController: NavController
+fun MostPopular(
+    popularItems: ArrayList<Item>,
+    navController: NavController
 ) {
 
     LazyRow(
@@ -479,9 +488,10 @@ fun MostPopular(modifier: Modifier = Modifier,
 }
 
 @Composable
-fun Electronics(modifier: Modifier = Modifier,
-                electronicsItems: ArrayList<Item>,
-                navController: NavController) {
+fun Electronics(
+    electronicsItems: ArrayList<Item>,
+    navController: NavController
+) {
 
 
     LazyRow(
@@ -489,19 +499,18 @@ fun Electronics(modifier: Modifier = Modifier,
     ) {
         items(
             items = electronicsItems, itemContent = {
-                if (it.category == "laptops" || it.category=="tablets" || it.category == "beauty") {
-                    OutlinedCardView(item=it, navController = navController)
-                }
+                OutlinedCardView(item = it, navController = navController)
+
             }
         )
     }
 
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun HomePreview() {
-//    EmuAppTheme {
-//        Home(navController = rememberNavController())
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun HomePreview() {
+    EmuAppTheme {
+        Home(navController = rememberNavController())
+    }
+}

@@ -9,4 +9,8 @@ interface ApiService {
     @GET("/products")
     fun getData(
         @Query("limit") limit: Int):Call<ApiItems>
+
+    @GET("/products/category/laptops")
+    fun getDataByCategory(
+        @Query("limit") limit: Int):Call<ApiItems>
 }

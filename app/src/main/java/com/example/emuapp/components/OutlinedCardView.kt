@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -37,12 +36,11 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
-import com.example.emuapp.data.Sizes
 import com.example.emuapp.screens.AllScreens
 
 @Composable
 fun OutlinedCardView(
-    modifier: Modifier=Modifier, item: Item, navController: NavController
+    item: Item, navController: NavController
 ) {
     val width = LocalConfiguration.current.screenWidthDp.dp
     val height = LocalConfiguration.current.screenHeightDp.dp
@@ -61,11 +59,10 @@ fun OutlinedCardView(
             containerColor = colorResource(R.color.white)
         ),
         modifier = Modifier
-            .width(width/2-28.dp)
-            .height(height/5),
-        shape = RoundedCornerShape(Sizes.borderRadius),
+            .width(width/2-20.dp)
+            .height(height/4),
         elevation = CardDefaults.outlinedCardElevation(
-            defaultElevation = Sizes.elevation
+            defaultElevation = 0.dp
         ),
         border = BorderStroke(1.dp, Color.Blue.copy(.1f))
     ) {
@@ -77,7 +74,7 @@ fun OutlinedCardView(
             Box(
                 modifier=Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(.8f)
+                    .fillMaxHeight(.7f)
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(item.thumbnail),
@@ -123,7 +120,15 @@ fun OutlinedCardView(
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = colorResource(R.color.primary)
                     ),
-                    onClick = {}
+                    onClick = {
+                        val itemParam = ArrayList<Item>()
+                        itemParam.add(item)
+                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                            "item",
+                            itemParam
+                        )
+                        navController.navigate(AllScreens.ItemView.route)
+                    }
                 ) {
                     Text(
                         text = "$ ${item.price}"
@@ -133,7 +138,15 @@ fun OutlinedCardView(
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = colorResource(R.color.primary)
                     ),
-                    onClick = {}
+                    onClick = {
+                        val itemParam = ArrayList<Item>()
+                        itemParam.add(item)
+                        navController.currentBackStackEntry?.savedStateHandle?.set(
+                            "item",
+                            itemParam
+                        )
+                        navController.navigate(AllScreens.ItemView.route)
+                    }
                 ) {
                     Text(
                         text = "View"

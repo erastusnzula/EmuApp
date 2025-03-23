@@ -15,10 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -27,7 +25,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,21 +38,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
-import com.example.emuapp.api.apiCall
-import com.example.emuapp.api.dataOffline
 import com.example.emuapp.data.InitialValues
+import com.example.emuapp.data.Item
 import com.example.emuapp.data.Sizes
 import com.example.emuapp.ui.theme.EmuAppTheme
 
 @Composable
-fun Items(modifier: Modifier=Modifier, navController: NavController) {
+fun Items(navController: NavController) {
     val width = LocalConfiguration.current.screenWidthDp.dp
     val height = LocalConfiguration.current.screenHeightDp.dp
 
@@ -68,8 +64,7 @@ fun Items(modifier: Modifier=Modifier, navController: NavController) {
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-
-
+                .background(colorResource(R.color.white))
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(width/4),
@@ -90,7 +85,7 @@ fun Items(modifier: Modifier=Modifier, navController: NavController) {
 
                 Text(
                     text = "All Items",
-                    style = MaterialTheme.typography.titleLarge,
+                   fontSize = 20.sp,
                     color = colorResource(R.color.primary)
                 )
             }
@@ -105,15 +100,23 @@ fun Items(modifier: Modifier=Modifier, navController: NavController) {
                     items = allItems,
                     itemContent = {item->
                         OutlinedCard(
+                            onClick = {
+                                val itemParam = ArrayList<Item>()
+                                itemParam.add(item)
+                                navController.currentBackStackEntry?.savedStateHandle?.set(
+                                    "item",
+                                    itemParam
+                                )
+                                navController.navigate(AllScreens.ItemView.route)
+                            },
                             colors = CardDefaults.outlinedCardColors(
                                 containerColor = colorResource(R.color.white)
                             ),
                             modifier = Modifier
-                                .width(width/2-28.dp)
-                                .height(height/5),
-                            shape = RoundedCornerShape(Sizes.borderRadius),
+                                .width(width/2-20.dp)
+                                .height(height/4),
                             elevation = CardDefaults.outlinedCardElevation(
-                                defaultElevation = Sizes.elevation
+                                defaultElevation = 0.dp
                             ),
                             border = BorderStroke(1.dp, Color.Blue.copy(.1f))
                         ) {
@@ -127,7 +130,7 @@ fun Items(modifier: Modifier=Modifier, navController: NavController) {
                                 Box(
                                     modifier=Modifier
                                         .fillMaxWidth()
-                                        .fillMaxHeight(.8f)
+                                        .fillMaxHeight(.7f)
                                 ) {
                                     Image(
                                         painter = rememberAsyncImagePainter(item.thumbnail),
@@ -173,7 +176,15 @@ fun Items(modifier: Modifier=Modifier, navController: NavController) {
                                         colors = ButtonDefaults.textButtonColors(
                                             contentColor = colorResource(R.color.primary)
                                         ),
-                                        onClick = {}
+                                        onClick = {
+                                            val itemParam = ArrayList<Item>()
+                                            itemParam.add(item)
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                "item",
+                                                itemParam
+                                            )
+                                            navController.navigate(AllScreens.ItemView.route)
+                                        }
                                     ) {
                                         Text(
                                             text = "$ ${item.price}"
@@ -183,7 +194,13 @@ fun Items(modifier: Modifier=Modifier, navController: NavController) {
                                         colors = ButtonDefaults.textButtonColors(
                                             contentColor = colorResource(R.color.primary)
                                         ),
-                                        onClick = {}
+                                        onClick = {val itemParam = ArrayList<Item>()
+                                            itemParam.add(item)
+                                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                                "item",
+                                                itemParam
+                                            )
+                                            navController.navigate(AllScreens.ItemView.route)}
                                     ) {
                                         Text(
                                             text = "View"
