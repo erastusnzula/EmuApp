@@ -54,13 +54,14 @@ fun Review (reviews: List<Reviews>){
             defaultElevation = 0.dp
         ),
         modifier=Modifier
-            .background(colorResource(R.color.white))
             .fillMaxWidth()
+
     ) {
         Column(
             modifier=Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
+                .background(colorResource(R.color.white))
         ) {
             Text(
                 text="Reviews",
@@ -76,7 +77,7 @@ fun Review (reviews: List<Reviews>){
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth().clip(RoundedCornerShape(topStart =10.dp, topEnd = 10.dp))
-                        .background(colorResource(R.color.primary).copy(.1f))
+                        .background(colorResource(R.color.white))
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -93,10 +94,12 @@ fun Review (reviews: List<Reviews>){
                         )
                         Column {
                             Text(
-                                text = it.reviewerName
+                                text = it.reviewerName,
+                                fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = it.reviewerEmail,
+                                color = colorResource(R.color.primary),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier
@@ -124,7 +127,7 @@ fun Review (reviews: List<Reviews>){
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(colorResource(R.color.primary).copy(.1f))
+                        .background(colorResource(R.color.white))
                 ){
                     Text(
                         textAlign = TextAlign.Justify,

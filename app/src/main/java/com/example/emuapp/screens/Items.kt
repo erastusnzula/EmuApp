@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
+import com.example.emuapp.api.dataOffline
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
 import com.example.emuapp.data.Sizes
@@ -91,7 +92,7 @@ fun Items(navController: NavController) {
             }
             Spacer(Modifier.height(Sizes.spacer))
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(width/2 - 20.dp),
+                columns = GridCells.Adaptive(width/2 - 50.dp),
                 modifier = Modifier,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -113,8 +114,8 @@ fun Items(navController: NavController) {
                                 containerColor = colorResource(R.color.primary).copy(.1f)
                             ),
                             modifier = Modifier
-                                .width(width/2-20.dp)
-                                .height(height/4),
+                                .width(width/2-50.dp)
+                                .height(height/6+ 10.dp),
                             elevation = CardDefaults.outlinedCardElevation(
                                 defaultElevation = 0.dp
                             ),

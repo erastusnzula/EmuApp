@@ -3,6 +3,7 @@ package com.example.emuapp.screens
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,6 +57,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
 import com.example.emuapp.api.singleItemViewOffline
 import com.example.emuapp.components.Review
+import com.example.emuapp.components.ZoomImage
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
 import com.example.emuapp.data.Sizes
@@ -63,6 +65,8 @@ import com.example.emuapp.ui.theme.EmuAppTheme
 
 @Composable
 fun ItemView(navController: NavController, item: ArrayList<Item>) {
+    val imageUrl = remember { mutableStateOf(item[0].thumbnail) }
+    val itemImagesUrl = remember {mutableStateOf("")}
     Scaffold(
         modifier = Modifier
             .padding(top = Sizes.top, end = Sizes.end, bottom = Sizes.bottom, start = Sizes.start)
@@ -133,12 +137,14 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                         val fvIcon = remember { mutableStateOf(Icons.Default.FavoriteBorder) }
                         val tint = remember { mutableStateOf(Color.Black.copy(.3f)) }
                         Image(
-                            painter = rememberAsyncImagePainter(item[0].thumbnail),
+                            painter = rememberAsyncImagePainter(imageUrl.value),
                             contentScale = ContentScale.FillBounds,
                             contentDescription = null,
                             modifier = Modifier
                                 .fillMaxSize()
+
                         )
+                        //ZoomImage(item[0].thumbnail)
                         IconButton(
                             modifier = Modifier
                                 .align(Alignment.TopEnd),
@@ -177,6 +183,7 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                 items(
                     items = item[0].images,
                     itemContent = {
+                        itemImagesUrl.value = it
                         OutlinedCard(
                             colors = CardDefaults.outlinedCardColors(
                                 containerColor = colorResource(R.color.white)
@@ -202,11 +209,14 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                                         .fillMaxHeight()
                                 ) {
                                     Image(
-                                        painter = rememberAsyncImagePainter(it),
+                                        painter = rememberAsyncImagePainter(itemImagesUrl.value),
                                         contentScale = ContentScale.FillBounds,
                                         contentDescription = null,
                                         modifier = Modifier
                                             .fillMaxSize()
+                                            .clickable {
+                                                imageUrl.value = it
+                                            }
                                     )
 
                                 }
@@ -240,51 +250,43 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                         .padding(8.dp)
                 ) {
                     Spacer(Modifier.height(5.dp))
-                    Row(
+                    Row (
+                        horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
                     ){
-                        Row (
-                            horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
-                            verticalAlignment = Alignment.CenterVertically,
+                        Text(
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            text = item[0].title,
+                            fontSize = 18.sp,
+                            color = colorResource(R.color.primary),
                             modifier = Modifier
-                                .width(width/2-30.dp)
-                        ){
-                            Text(
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                text = item[0].title,
-                                fontSize = 18.sp,
-                                color = colorResource(R.color.primary),
-                                modifier = Modifier
-                                    .horizontalScroll(rememberScrollState())
-                            )
-                        }
-                        Spacer(Modifier.width(5.dp))
-                        Row (
-                            horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
-                            verticalAlignment = Alignment.CenterVertically,
+                                .horizontalScroll(rememberScrollState())
+                        )
+                    }
+                    Spacer(Modifier.height(5.dp))
+                    Row (
+                        horizontalArrangement = Arrangement.spacedBy(Sizes.spacer),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                    ){
+                        Text(
+                            text = "Category: ",
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            text = item[0].category,
+                            fontSize = 16.sp,
+                            color = colorResource(R.color.primary),
                             modifier = Modifier
-                        ){
-                            Text(
-                                text = "Category: ",
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                                text = item[0].category,
-                                fontSize = 16.sp,
-                                color = colorResource(R.color.primary),
-                                modifier = Modifier
-                                    .horizontalScroll(rememberScrollState())
-                            )
-                        }
+                                .horizontalScroll(rememberScrollState())
+                        )
                     }
                     Spacer(Modifier.height(5.dp))
                     Row(

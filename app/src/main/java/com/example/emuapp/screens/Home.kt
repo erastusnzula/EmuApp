@@ -1,5 +1,9 @@
 package com.example.emuapp.screens
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -79,6 +83,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
 import com.example.emuapp.api.apiCall
@@ -102,6 +107,12 @@ fun Home(navController: NavController) {
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val imageUrl = remember { mutableStateOf<Uri?>(null) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) {uri: Uri? ->
+        imageUrl.value = uri
+    }
 
     InitialValues.fetchedItems = allItems
 
@@ -123,23 +134,41 @@ fun Home(navController: NavController) {
                             .fillMaxWidth(),
                         contentAlignment = Alignment.Center,
                     ){
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = null,
-                            tint = colorResource(R.color.primary),
-                            modifier = Modifier
-                                .padding(top = 10.dp)
-                                .size(100.dp).clip(CircleShape)
+                        if (imageUrl.value != null) {
+                            InitialValues.topBarIcon.value = imageUrl.value
+                            AsyncImage(
+                                model = imageUrl.value,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .padding(top = 10.dp)
+                                    .size(100.dp).clip(CircleShape)
 
-                        )
+                            )
+                        }else{
+                            Icon(
+                                imageVector =Icons.Filled.AccountCircle ,
+                                contentDescription = null,
+                                tint = colorResource(R.color.primary),
+                                modifier = Modifier
+                                    .padding(top = 10.dp)
+                                    .size(100.dp).clip(CircleShape)
+
+                            )
+
+                        }
                         Icon(
                             imageVector = Icons.Default.AttachFile,
                             contentDescription = null,
                             tint = colorResource(R.color.primary),
                             modifier = Modifier
                                 .padding(start = 120.dp, bottom = 80.dp)
+                                .clickable {
+                                    launcher.launch("image/*")
+                                }
                         )
                     }
+                    Spacer(Modifier.height(Sizes.spacer))
                     NavigationDrawerItem(
                         label = {
                             Text(
@@ -410,14 +439,26 @@ fun HomeTopBar(scope:CoroutineScope, drawerState: DrawerState, navController: Na
                     }
                 }
             ) {
-                Icon(
-                    imageVector = InitialValues.topBarIcon.value,
-                    contentDescription = null,
-                    tint = colorResource(R.color.primary),
-                    modifier = Modifier
-                        .size(Sizes.topLeft)
-                        .clip(CircleShape)
-                )
+                if (InitialValues.topBarIcon.value != null){
+                    AsyncImage(
+                        model = InitialValues.topBarIcon.value,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(Sizes.topLeft).clip(CircleShape)
+
+                    )
+
+                }else {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = null,
+                        tint = colorResource(R.color.primary),
+                        modifier = Modifier
+                            .size(Sizes.topLeft)
+                            .clip(CircleShape)
+                    )
+                }
             }
             Text(
                 text = "Hi,Erastus"
@@ -490,8 +531,10 @@ fun HomeBottomBar(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Search(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
     val searchQuery = remember { mutableStateOf("") }
-    val active = remember { mutableStateOf(false) }
+    val active = remember { mutableStateOf(false
+    ) }
     val searchList = listOf("bananas", "beans", "carrots")
     val searchOutPut = searchList.filter { it.contains(searchQuery.value, ignoreCase = true) }
     SearchBar(
@@ -499,10 +542,10 @@ fun Search(modifier: Modifier = Modifier) {
             containerColor = colorResource(R.color.primary).copy(.1f)
         ),
         query = searchQuery.value,
-        onQueryChange = { },
+        onQueryChange = {},
         onSearch = { },
         active = active.value,
-        onActiveChange = { },
+        onActiveChange = {},
         modifier = Modifier
             .fillMaxWidth(),
         //.border(width = 1.dp, color = colorResource(R.color.primary), shape = RoundedCornerShape(10.dp)),
@@ -529,9 +572,10 @@ fun Search(modifier: Modifier = Modifier) {
     ) {
         searchOutPut.forEach {
             Text(
-                text = "jhhjh"
+                text = it
             )
         }
+        //Toast.makeText(context, "Searching items", Toast.LENGTH_LONG).show()
 
     }
 

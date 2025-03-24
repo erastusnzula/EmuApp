@@ -60,8 +60,8 @@ fun OutlinedCardView(
             containerColor = colorResource(R.color.primary).copy(.1f)
         ),
         modifier = Modifier
-            .width(width/2-20.dp)
-            .height(height/5),
+            .width(width/2-50.dp)
+            .height(height/6+ 10.dp),
         elevation = CardDefaults.outlinedCardElevation(
             defaultElevation = 0.dp
         ),
