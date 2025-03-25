@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.EmuApp" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.App.Start" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/primary</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimationDuration">200</item>
+        <item name="postSplashScreenTheme">@style/Theme.EmuApp</item>
+    </style>
 </resources>

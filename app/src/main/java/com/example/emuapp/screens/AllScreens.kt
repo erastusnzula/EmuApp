@@ -8,6 +8,8 @@ sealed class AllScreens(val route: String) {
     data object Settings: AllScreens("settings")
     data object Contact: AllScreens("contact")
     data object FAQ: AllScreens("FAQ")
+    data object Register: AllScreens("register")
+    data object LogIn: AllScreens("log-in")
     data object Notifications: AllScreens("notifications")
 
 }

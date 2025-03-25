@@ -1,20 +1,16 @@
 package com.example.emuapp.screens
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,13 +20,11 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -45,56 +39,49 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.emuapp.R
 import com.example.emuapp.data.Sizes
 import com.example.emuapp.model.AuthModel
 import com.example.emuapp.model.CustomerStatus
-
+import com.example.emuapp.ui.theme.EmuAppTheme
 
 @Composable
-fun Register(navController: NavController, authModel: AuthModel) {
+fun LogIn(navController: NavController, authModel: AuthModel) {
     val height = LocalConfiguration.current.screenHeightDp.dp
     val width = LocalConfiguration.current.screenWidthDp.dp
-    val firstName = remember { mutableStateOf("") }
-    val lastName = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
-    val passwordConfirm = remember { mutableStateOf("") }
-    val errorMessage = remember{mutableStateOf("")}
     val checked = remember { mutableStateOf(true) }
+    val errorMessage = remember { mutableStateOf("") }
     val authStatus = authModel.authStatus.observeAsState()
     LaunchedEffect(authStatus.value) {
         when(authStatus.value){
             is CustomerStatus.AUTHENTICATED ->{
                 navController.navigate(AllScreens.Home.route)
             }
-            is CustomerStatus.Error->{
+            is CustomerStatus.Error ->{
                 errorMessage.value = (authStatus.value as CustomerStatus.Error).message
+
             }
-            else->Unit
+            else -> Unit
         }
     }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val passwordVisible = remember { mutableStateOf(false) }
+    val passwordVisible = remember{mutableStateOf(false)}
     val visibleIcon = Icons.Default.Visibility
     val inVisibleIcon = Icons.Default.VisibilityOff
     Scaffold(
@@ -112,51 +99,25 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "Get started",
+                text = "Welcome Back",
                 textAlign = TextAlign.Center,
                 //fontWeight = FontWeight.ExtraBold,
-                style = MaterialTheme.typography.displayMedium,
+                style = MaterialTheme.typography.displaySmall,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             )
-            if(errorMessage.value != null){
+            if (errorMessage.value != null){
                 Spacer(Modifier.height(Sizes.spacer))
                 Text(
                     textAlign = TextAlign.Center,
+                    text = errorMessage.value,
                     color = Color.Red,
-                    text= errorMessage.value,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                 )
             }
 
-            Spacer(Modifier.height(Sizes.spacer))
-            TextField(
-                label = {
-                    Text(
-                        text="First Name"
-                    )
-                },
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedIndicatorColor = colorResource(R.color.primary),
-                    focusedIndicatorColor = colorResource(R.color.primary),
-                ),
-                singleLine = true,
-                maxLines = 1,
-                shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp),
-                value = firstName.value,
-                onValueChange = {firstName.value = it},
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
-                placeholder = {
-                    Text(
-                        text = "First Name"
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
+
             Spacer(Modifier.height(Sizes.spacer))
             TextField(
                 colors = TextFieldDefaults.colors(
@@ -165,39 +126,10 @@ fun Register(navController: NavController, authModel: AuthModel) {
                     unfocusedIndicatorColor = colorResource(R.color.primary),
                     focusedIndicatorColor = colorResource(R.color.primary),
                 ),
-                shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp),
-                value = lastName.value,
-                onValueChange = {lastName.value = it},
-                placeholder = {
-                    Text(
-                        text = "Last Name"
-                    )
-                },
-                label = {
-                    Text(
-                        text="Last Name"
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
-                singleLine = true,
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            Spacer(Modifier.height(Sizes.spacer))
-            TextField(
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedIndicatorColor = colorResource(R.color.primary),
-                    focusedIndicatorColor = colorResource(R.color.primary),
-                ),
-                singleLine = true,
-                maxLines = 1,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp),
                 value = email.value,
                 onValueChange = {email.value = it},
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 placeholder = {
                     Text(
                         text = "Email Address"
@@ -208,6 +140,8 @@ fun Register(navController: NavController, authModel: AuthModel) {
                         text="Email Address"
                     )
                 },
+                singleLine = true,
+                maxLines = 1,
                 modifier = Modifier
                     .fillMaxWidth()
             )
@@ -218,6 +152,7 @@ fun Register(navController: NavController, authModel: AuthModel) {
                     focusedContainerColor = Color.Transparent,
                     unfocusedIndicatorColor = colorResource(R.color.primary),
                     focusedIndicatorColor = colorResource(R.color.primary),
+
                 ),
                 shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp),
                 value = password.value,
@@ -227,73 +162,74 @@ fun Register(navController: NavController, authModel: AuthModel) {
                         text = "Password"
                     )
                 },
-                singleLine = true,
-                maxLines = 1,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
-                visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
                 label = {
                     Text(
                         text="Password"
                     )
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-            )
-            Spacer(Modifier.height(Sizes.spacer))
-            TextField(
-                label = {
-                    Text(
-                        text="Re-Enter Password"
-                    )
-                },
-                singleLine = true,
-                maxLines = 1,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = {
                     keyboardController?.hide()
-                    authModel.register(
-                        firstName = firstName.value,
-                        lastName = lastName.value,
+                    authModel.login(
                         email = email.value,
-                        password = password.value,
-                        confirmPassword = passwordConfirm.value
+                        password = password.value
                     )
                 }),
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = Color.Transparent,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedIndicatorColor = colorResource(R.color.primary),
-                    focusedIndicatorColor = colorResource(R.color.primary),
-                ),
-                shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp),
-                value = passwordConfirm.value,
-                onValueChange = {passwordConfirm.value = it},
-                placeholder = {
-                    Text(
-                        text = "Re-Enter Password"
-                    )
+                singleLine = true,
+                maxLines = 1,
+                visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            passwordVisible.value = !passwordVisible.value
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if(passwordVisible.value) visibleIcon else inVisibleIcon,
+                            contentDescription = null,
+                            tint = colorResource(R.color.primary)
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
             )
             Spacer(Modifier.height(Sizes.spacer))
-            Row {
-                Checkbox(
-                    checked = checked.value,
-                    onCheckedChange = {checked.value = it},
-                    modifier = Modifier,
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = colorResource(R.color.primary)
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Row {
+                    Checkbox(
+                        checked = checked.value,
+                        onCheckedChange = {checked.value = it},
+                        modifier = Modifier,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = colorResource(R.color.primary)
+                        )
                     )
-                )
+                    TextButton(
+                        onClick = {}
+                    ){
+                        Text(
+                            text = "Remember Me",
+                            color = colorResource(R.color.primary)
+                        )
+                    }
+                }
                 TextButton(
                     onClick = {}
                 ){
                     Text(
-                        text = "I accept terms and conditions"
+                        text = "Forgot Password?",
+                        color = colorResource(R.color.primary)
                     )
                 }
+
             }
+
             Spacer(Modifier.height(Sizes.spacer))
             Button(
                 colors = ButtonDefaults.buttonColors(
@@ -302,17 +238,14 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 modifier = Modifier
                     .fillMaxWidth(),
                 onClick = {
-                    authModel.register(
-                        firstName = firstName.value,
-                        lastName = lastName.value,
+                    authModel.login(
                         email = email.value,
-                        password = password.value,
-                        confirmPassword = passwordConfirm.value
+                        password = password.value
                     )
                 }
             ) {
                 Text(
-                    text = "Sign Up",
+                    text = "Sign In",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -325,7 +258,7 @@ fun Register(navController: NavController, authModel: AuthModel) {
             ){
                 HorizontalDivider(Modifier.width(width/3))
                 Text(
-                    text = "Sign up With"
+                    text = "Sign in with"
                 )
                 HorizontalDivider(Modifier.width(width/3))
             }
@@ -366,11 +299,11 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally),
                 onClick = {
-                    navController.navigate(AllScreens.LogIn.route)
+                    navController.navigate(AllScreens.Register.route)
                 }
             ) {
                 Text(
-                    text = "Already have an account? Sign in",
+                    text = "Don't have an account? Sign up",
                     color = colorResource(R.color.primary)
                 )
             }
@@ -379,12 +312,12 @@ fun Register(navController: NavController, authModel: AuthModel) {
         }
 
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
-fun RegisterPreview() {
-    Register(navController = rememberNavController(),
-        authModel = AuthModel())
+fun LogInPreview(){
+    EmuAppTheme {
+        LogIn(navController = rememberNavController(), AuthModel())
+    }
 }

@@ -4,6 +4,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -65,6 +66,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -93,7 +96,10 @@ import com.example.emuapp.components.OutlinedCardView
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
 import com.example.emuapp.data.Sizes
+import com.example.emuapp.model.AuthModel
+import com.example.emuapp.model.CustomerStatus
 import com.example.emuapp.ui.theme.EmuAppTheme
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -102,7 +108,7 @@ val allItems = apiCall()
 val allItemsByCategory = apiCallByCategory()
 
 @Composable
-fun Home(navController: NavController) {
+fun Home(navController: NavController, authModel: AuthModel) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -112,6 +118,18 @@ fun Home(navController: NavController) {
         contract = ActivityResultContracts.GetContent()
     ) {uri: Uri? ->
         imageUrl.value = uri
+    }
+    val authStatus = authModel.authStatus.observeAsState()
+    LaunchedEffect(authStatus.value) {
+        when(authStatus.value){
+            is CustomerStatus.UNAUTHENTICATED ->{
+                navController.navigate(AllScreens.LogIn.route)
+            }
+            is CustomerStatus.Error ->{
+                InitialValues.error.value = (authStatus.value as CustomerStatus.Error).message
+            }
+            else -> Unit
+        }
     }
 
     InitialValues.fetchedItems = allItems
@@ -125,9 +143,12 @@ fun Home(navController: NavController) {
                 windowInsets = WindowInsets.systemBars
             ) {
                 Column(
+                    verticalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .padding(top=20.dp)
-                        .padding(10.dp),
+                        .fillMaxSize()
+                        .padding(top=20.dp, bottom = 28.dp)
+                        .padding(10.dp)
+                        .verticalScroll(rememberScrollState()),
                 ) {
                     Box(
                         modifier = Modifier
@@ -273,6 +294,8 @@ fun Home(navController: NavController) {
                         modifier = Modifier
                             .fillMaxWidth(),
                         onClick = {
+                            authModel.logOut()
+                            navController.navigate(AllScreens.LogIn.route)
 
                     }) {
                         Text(
@@ -284,14 +307,15 @@ fun Home(navController: NavController) {
                 }
             }
         },
-        modifier = Modifier,
+        modifier = Modifier
+            .background(colorResource(R.color.white)),
         drawerState = drawerState,
         gesturesEnabled = true,
         scrimColor = Color.Blue.copy(.2f)
     ) {
         Scaffold(
             modifier = Modifier
-                .padding(top = Sizes.top, start = Sizes.start, end = Sizes.end, bottom = Sizes.bottom),
+                .padding(top = Sizes.top,bottom = Sizes.bottom),
             topBar = { HomeTopBar(scope=scope, drawerState = drawerState, navController=navController) },
             bottomBar = { HomeBottomBar(navController=navController) },
             snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -304,6 +328,7 @@ fun Home(navController: NavController) {
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
+                    .padding( start = Sizes.start, end = Sizes.end)
                     .verticalScroll(rememberScrollState())
             ) {
                 Search()
@@ -416,6 +441,7 @@ fun Home(navController: NavController) {
 
 @Composable
 fun HomeTopBar(scope:CoroutineScope, drawerState: DrawerState, navController: NavController) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -461,7 +487,7 @@ fun HomeTopBar(scope:CoroutineScope, drawerState: DrawerState, navController: Na
                 }
             }
             Text(
-                text = "Hi,Erastus"
+                text = "Hi, ${currentUser?.displayName}"
             )
         }
 
@@ -583,6 +609,7 @@ fun Search(modifier: Modifier = Modifier) {
 
 @Composable
 fun OfferDisplay(
+
     items: ArrayList<Item>,
     navController: NavController
 ) {
@@ -745,7 +772,8 @@ fun Electronics(
 @Preview(showBackground = true)
 @Composable
 fun HomePreview() {
+
     EmuAppTheme {
-        Home(navController = rememberNavController())
+        Home(navController = rememberNavController(), AuthModel())
     }
 }

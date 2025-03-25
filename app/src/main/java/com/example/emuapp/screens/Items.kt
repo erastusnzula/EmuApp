@@ -59,12 +59,12 @@ fun Items(navController: NavController) {
     val allItems = InitialValues.fetchedItems
     Scaffold(
         modifier=Modifier
-            .padding(top=Sizes.top, start = Sizes.start, end = Sizes.end, bottom = Sizes.bottom)
     ) {innerPadding->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
+                .padding(top=Sizes.top, start = Sizes.start, end = Sizes.end, bottom = Sizes.bottom)
                 .background(colorResource(R.color.white))
         ) {
             Row(

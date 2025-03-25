@@ -69,13 +69,14 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
     val itemImagesUrl = remember {mutableStateOf("")}
     Scaffold(
         modifier = Modifier
-            .padding(top = Sizes.top, end = Sizes.end, bottom = Sizes.bottom, start = Sizes.start)
+
     ) {innerPadding->
         Column(
             modifier = Modifier
                 .background(colorResource(R.color.white))
                 .padding(innerPadding)
                 .fillMaxSize()
+                .padding(top = Sizes.top, end = Sizes.end, bottom = Sizes.bottom, start = Sizes.start)
                 .verticalScroll(rememberScrollState())
         ) {
             val width = LocalConfiguration.current.screenWidthDp.dp
