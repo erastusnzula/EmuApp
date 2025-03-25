@@ -16,6 +16,8 @@ class AuthModel: ViewModel() {
 
     }
 
+
+
     private fun checkStatus(){
         if (auth.currentUser != null){
             _authStatus.value = CustomerStatus.AUTHENTICATED

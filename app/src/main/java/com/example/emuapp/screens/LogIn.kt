@@ -1,5 +1,8 @@
 package com.example.emuapp.screens
 
+import android.Manifest
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -54,11 +58,17 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.emuapp.R
+import com.example.emuapp.components.NotificationBody
 import com.example.emuapp.data.Sizes
 import com.example.emuapp.model.AuthModel
 import com.example.emuapp.model.CustomerStatus
 import com.example.emuapp.ui.theme.EmuAppTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LogIn(navController: NavController, authModel: AuthModel) {
     val height = LocalConfiguration.current.screenHeightDp.dp
@@ -68,10 +78,19 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
     val checked = remember { mutableStateOf(true) }
     val errorMessage = remember { mutableStateOf("") }
     val authStatus = authModel.authStatus.observeAsState()
+    val context = LocalContext.current
+    val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    val notificationBody = NotificationBody(context, "Logged in successfully", "Log In")
+    LaunchedEffect(key1 = true) {
+        if (!notificationPermission.status.isGranted) {
+            notificationPermission.launchPermissionRequest()
+        }
+    }
     LaunchedEffect(authStatus.value) {
         when(authStatus.value){
             is CustomerStatus.AUTHENTICATED ->{
                 navController.navigate(AllScreens.Home.route)
+                notificationBody.showNotification()
             }
             is CustomerStatus.Error ->{
                 errorMessage.value = (authStatus.value as CustomerStatus.Error).message

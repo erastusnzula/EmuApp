@@ -1,10 +1,12 @@
 package com.example.emuapp.screens
-
 import android.net.Uri
+import android.os.Build
+import android.Manifest
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -92,6 +94,7 @@ import com.example.emuapp.R
 import com.example.emuapp.api.apiCall
 import com.example.emuapp.api.apiCallByCategory
 import com.example.emuapp.api.dataOffline
+import com.example.emuapp.components.NotificationBody
 import com.example.emuapp.components.OutlinedCardView
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
@@ -99,6 +102,9 @@ import com.example.emuapp.data.Sizes
 import com.example.emuapp.model.AuthModel
 import com.example.emuapp.model.CustomerStatus
 import com.example.emuapp.ui.theme.EmuAppTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -107,6 +113,8 @@ import kotlinx.coroutines.launch
 val allItems = apiCall()
 val allItemsByCategory = apiCallByCategory()
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun Home(navController: NavController, authModel: AuthModel) {
     val context = LocalContext.current
@@ -129,6 +137,13 @@ fun Home(navController: NavController, authModel: AuthModel) {
                 InitialValues.error.value = (authStatus.value as CustomerStatus.Error).message
             }
             else -> Unit
+        }
+    }
+    val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+    val notificationBody = NotificationBody(context, "Data fetched successfully", "Data fetch")
+    LaunchedEffect(key1 = true) {
+        if (!notificationPermission.status.isGranted) {
+            notificationPermission.launchPermissionRequest()
         }
     }
 
@@ -331,6 +346,7 @@ fun Home(navController: NavController, authModel: AuthModel) {
                     .padding( start = Sizes.start, end = Sizes.end)
                     .verticalScroll(rememberScrollState())
             ) {
+
                 Search()
                 Spacer(Modifier.height(Sizes.spacer))
                 Text(
@@ -345,6 +361,7 @@ fun Home(navController: NavController, authModel: AuthModel) {
                 OfferDisplay(items = allItems, navController = navController)
                 Spacer(Modifier.height(Sizes.spacer))
                 if (allItems.size != 0) {
+                    //notificationBody.showNotification()
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
