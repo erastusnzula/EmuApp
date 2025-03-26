@@ -96,12 +96,11 @@ fun Register(navController: NavController, authModel: AuthModel) {
     val context = LocalContext.current
     val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
     val notificationBody = NotificationBody(context, "Signed up successfully", "Sign Up")
-    LaunchedEffect(key1 = true) {
+
+    LaunchedEffect(authStatus.value) {
         if (!notificationPermission.status.isGranted) {
             notificationPermission.launchPermissionRequest()
         }
-    }
-    LaunchedEffect(authStatus.value) {
         when(authStatus.value){
             is CustomerStatus.AUTHENTICATED ->{
                 navController.navigate(AllScreens.Home.route)
@@ -139,16 +138,14 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             )
-            if(errorMessage.value != null){
-                Spacer(Modifier.height(Sizes.spacer))
-                Text(
-                    textAlign = TextAlign.Center,
-                    color = Color.Red,
-                    text= errorMessage.value,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
+            Spacer(Modifier.height(Sizes.spacer))
+            Text(
+                textAlign = TextAlign.Center,
+                color = Color.Red,
+                text= errorMessage.value,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+            )
 
             Spacer(Modifier.height(Sizes.spacer))
             TextField(
@@ -160,9 +157,11 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     unfocusedIndicatorColor = colorResource(R.color.primary),
                     focusedIndicatorColor = colorResource(R.color.primary),
                 ),
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 singleLine = true,
                 maxLines = 1,
                 shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp),
@@ -182,6 +181,7 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     unfocusedIndicatorColor = colorResource(R.color.primary),
                     focusedIndicatorColor = colorResource(R.color.primary),
                 ),
@@ -198,6 +198,7 @@ fun Register(navController: NavController, authModel: AuthModel) {
                         text="Last Name"
                     )
                 },
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Next),
                 singleLine = true,
                 maxLines = 1,
@@ -209,9 +210,11 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     unfocusedIndicatorColor = colorResource(R.color.primary),
                     focusedIndicatorColor = colorResource(R.color.primary),
                 ),
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 singleLine = true,
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
@@ -236,9 +239,11 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     unfocusedIndicatorColor = colorResource(R.color.primary),
                     focusedIndicatorColor = colorResource(R.color.primary),
                 ),
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp),
                 value = password.value,
                 onValueChange = {password.value = it},
@@ -289,15 +294,18 @@ fun Register(navController: NavController, authModel: AuthModel) {
                         lastName = lastName.value,
                         email = email.value,
                         password = password.value,
-                        confirmPassword = passwordConfirm.value
+                        confirmPassword = passwordConfirm.value,
+                        isChecked = checked.value
                     )
                 }),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     unfocusedIndicatorColor = colorResource(R.color.primary),
                     focusedIndicatorColor = colorResource(R.color.primary),
                 ),
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp),
                 value = passwordConfirm.value,
                 onValueChange = {passwordConfirm.value = it},
@@ -330,13 +338,15 @@ fun Register(navController: NavController, authModel: AuthModel) {
                     modifier = Modifier,
                     colors = CheckboxDefaults.colors(
                         checkedColor = colorResource(R.color.primary)
-                    )
+                    ),
+                    enabled = authStatus.value != CustomerStatus.IsLoading
                 )
                 TextButton(
                     onClick = {}
                 ){
                     Text(
-                        text = "I accept terms and conditions"
+                        text = "I accept terms and conditions",
+                        color = colorResource(R.color.primary)
                     )
                 }
             }
@@ -347,13 +357,15 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 ),
                 modifier = Modifier
                     .fillMaxWidth(),
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 onClick = {
                     authModel.register(
                         firstName = firstName.value,
                         lastName = lastName.value,
                         email = email.value,
                         password = password.value,
-                        confirmPassword = passwordConfirm.value
+                        confirmPassword = passwordConfirm.value,
+                        isChecked = checked.value
                     )
                 }
             ) {

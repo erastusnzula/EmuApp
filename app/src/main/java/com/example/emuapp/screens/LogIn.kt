@@ -81,24 +81,26 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
     val context = LocalContext.current
     val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
     val notificationBody = NotificationBody(context, "Logged in successfully", "Log In")
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(authStatus.value) {
         if (!notificationPermission.status.isGranted) {
             notificationPermission.launchPermissionRequest()
         }
-    }
-    LaunchedEffect(authStatus.value) {
         when(authStatus.value){
             is CustomerStatus.AUTHENTICATED ->{
                 navController.navigate(AllScreens.Home.route)
                 notificationBody.showNotification()
             }
-            is CustomerStatus.Error ->{
-                errorMessage.value = (authStatus.value as CustomerStatus.Error).message
+            is CustomerStatus.ErrorLogin ->{
+                errorMessage.value = (authStatus.value as CustomerStatus.ErrorLogin).message
 
             }
             else -> Unit
         }
+
     }
+//    LaunchedEffect(authStatus.value) {
+//
+//    }
     val keyboardController = LocalSoftwareKeyboardController.current
     val passwordVisible = remember{mutableStateOf(false)}
     val visibleIcon = Icons.Default.Visibility
@@ -125,16 +127,14 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
             )
-            if (errorMessage.value != null){
-                Spacer(Modifier.height(Sizes.spacer))
-                Text(
-                    textAlign = TextAlign.Center,
-                    text = errorMessage.value,
-                    color = Color.Red,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
+            Spacer(Modifier.height(Sizes.spacer))
+            Text(
+                textAlign = TextAlign.Center,
+                text = errorMessage.value,
+                color = Color.Red,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+            )
 
 
             Spacer(Modifier.height(Sizes.spacer))
@@ -142,6 +142,8 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+
                     unfocusedIndicatorColor = colorResource(R.color.primary),
                     focusedIndicatorColor = colorResource(R.color.primary),
                 ),
@@ -159,6 +161,7 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
                         text="Email Address"
                     )
                 },
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 singleLine = true,
                 maxLines = 1,
                 modifier = Modifier
@@ -169,6 +172,7 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = Color.Transparent,
                     focusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
                     unfocusedIndicatorColor = colorResource(R.color.primary),
                     focusedIndicatorColor = colorResource(R.color.primary),
 
@@ -181,6 +185,7 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
                         text = "Password"
                     )
                 },
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 label = {
                     Text(
                         text="Password"
@@ -227,7 +232,8 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
                         modifier = Modifier,
                         colors = CheckboxDefaults.colors(
                             checkedColor = colorResource(R.color.primary)
-                        )
+                        ),
+                        enabled = authStatus.value != CustomerStatus.IsLoading
                     )
                     TextButton(
                         onClick = {}
@@ -254,6 +260,7 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.primary)
                 ),
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 modifier = Modifier
                     .fillMaxWidth(),
                 onClick = {
@@ -261,6 +268,7 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
                         email = email.value,
                         password = password.value
                     )
+
                 }
             ) {
                 Text(

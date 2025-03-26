@@ -351,7 +351,7 @@ fun Home(navController: NavController, authModel: AuthModel) {
                 Spacer(Modifier.height(Sizes.spacer))
                 Text(
                     text = InitialValues.error.value,
-                    color = Color.Red.copy(0.5f),
+                    color = colorResource(R.color.primary),
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
                     modifier = Modifier

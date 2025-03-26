@@ -33,20 +33,20 @@ class AuthModel: ViewModel() {
                 if (it.isSuccessful){
                     _authStatus.value = CustomerStatus.AUTHENTICATED
                 }else{
-                    _authStatus.value = CustomerStatus.Error(
+                    _authStatus.value = CustomerStatus.ErrorLogin(
                         message = it.exception?.message.toString()
                     )
                 }
             }
         }else{
-            _authStatus.value = CustomerStatus.Error(
+            _authStatus.value = CustomerStatus.ErrorLogin(
                 message = "Email and Password can't be blank!!"
             )
         }
     }
 
-    fun register(firstName: String, lastName: String,email: String, password: String, confirmPassword: String){
-        if (email.isNotBlank() && password.isNotBlank() && firstName.isNotBlank() && lastName.isNotBlank()){
+    fun register(firstName: String, lastName: String,email: String, password: String, confirmPassword: String, isChecked:Boolean){
+        if (email.isNotBlank() && password.isNotBlank() && firstName.isNotBlank() && lastName.isNotBlank() && isChecked){
             if (password == confirmPassword){
                 _authStatus.value = CustomerStatus.IsLoading
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener{
@@ -90,5 +90,6 @@ sealed class CustomerStatus{
     data object AUTHENTICATED: CustomerStatus()
     data object UNAUTHENTICATED: CustomerStatus()
     data class Error(val message: String):CustomerStatus()
+    data class ErrorLogin(val message: String):CustomerStatus()
 
 }

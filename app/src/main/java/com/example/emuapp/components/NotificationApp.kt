@@ -8,6 +8,9 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NotificationsNone
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.colorResource
 import androidx.core.app.NotificationCompat
 import com.example.emuapp.R
 import kotlin.random.Random
@@ -33,7 +36,8 @@ class NotificationBody(private val context: Context, private val message: String
         val builder= NotificationCompat.Builder(context,notificationChannelID)
             .setContentTitle(title)
             .setContentText(message)
-            .setSmallIcon(R.drawable.play_store_512)
+            .setSmallIcon(R.drawable.notification_small_icon)
+            .setColor(Color.Blue.toArgb())
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
             .setAutoCancel(true)
             .build()
