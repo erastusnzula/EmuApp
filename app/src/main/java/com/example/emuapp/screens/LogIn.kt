@@ -2,6 +2,8 @@ package com.example.emuapp.screens
 
 import android.Manifest
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +42,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -55,6 +59,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.emuapp.R
@@ -66,6 +72,17 @@ import com.example.emuapp.ui.theme.EmuAppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.auth
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class)
@@ -81,6 +98,12 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
     val context = LocalContext.current
     val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
     val notificationBody = NotificationBody(context, "Logged in successfully", "Log In")
+
+    val credentialManager = CredentialManager.create(context)
+    val token = stringResource(R.string.client_id)
+    val scope = rememberCoroutineScope()
+
+
     LaunchedEffect(authStatus.value) {
         if (!notificationPermission.status.isGranted) {
             notificationPermission.launchPermissionRequest()
@@ -105,6 +128,8 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
     val passwordVisible = remember{mutableStateOf(false)}
     val visibleIcon = Icons.Default.Visibility
     val inVisibleIcon = Icons.Default.VisibilityOff
+
+
     Scaffold(
         containerColor = colorResource(R.color.white),
         modifier = Modifier
@@ -116,7 +141,12 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(top = Sizes.top, bottom = Sizes.bottom, end = Sizes.end, start = Sizes.start)
+                .padding(
+                    top = Sizes.top,
+                    bottom = Sizes.bottom,
+                    end = Sizes.end,
+                    start = Sizes.start
+                )
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
@@ -295,10 +325,31 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent
                 ),
+                enabled = authStatus.value != CustomerStatus.IsLoading,
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
                     .align(Alignment.CenterHorizontally),
-                onClick = {}
+                onClick = {
+                    val googleIdOption = GetGoogleIdOption.Builder()
+                        .setServerClientId(token)
+                        .setFilterByAuthorizedAccounts(false)
+                        .setAutoSelectEnabled(true)
+                        .build()
+                    val request = GetCredentialRequest.Builder()
+                        .addCredentialOption(googleIdOption)
+                        .build()
+                    scope.launch {
+                        try {
+                            val results = credentialManager.getCredential(
+                                context = context,
+                                request = request
+                            )
+                            authModel.googleLogin(results)
+                        }catch (e:Exception) {
+                            if (e is CancellationException) return@launch
+                        }
+                    }
+                }
             ) {
                 Row (
                     verticalAlignment = Alignment.CenterVertically,

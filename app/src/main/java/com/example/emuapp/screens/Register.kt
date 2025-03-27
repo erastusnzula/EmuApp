@@ -47,6 +47,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +58,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -67,6 +69,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.emuapp.R
@@ -77,6 +81,9 @@ import com.example.emuapp.model.CustomerStatus
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -96,6 +103,10 @@ fun Register(navController: NavController, authModel: AuthModel) {
     val context = LocalContext.current
     val notificationPermission = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
     val notificationBody = NotificationBody(context, "Signed up successfully", "Sign Up")
+
+    val credentialManager = CredentialManager.create(context)
+    val token = stringResource(R.string.client_id)
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(authStatus.value) {
         if (!notificationPermission.status.isGranted) {
@@ -396,7 +407,27 @@ fun Register(navController: NavController, authModel: AuthModel) {
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
                     .align(Alignment.CenterHorizontally),
-                onClick = {}
+                onClick = {
+                    val googleIdOption = GetGoogleIdOption.Builder()
+                        .setServerClientId(token)
+                        .setFilterByAuthorizedAccounts(false)
+                        .setAutoSelectEnabled(true)
+                        .build()
+                    val request = GetCredentialRequest.Builder()
+                        .addCredentialOption(googleIdOption)
+                        .build()
+                    scope.launch {
+                        try {
+                            val results = credentialManager.getCredential(
+                                context = context,
+                                request = request
+                            )
+                            authModel.googleLogin(results)
+                        }catch (e:Exception){
+                            if (e is CancellationException)return@launch
+                        }
+                    }
+                }
             ) {
                 Row (
                     verticalAlignment = Alignment.CenterVertically,

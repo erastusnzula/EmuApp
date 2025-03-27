@@ -1,9 +1,15 @@
 package com.example.emuapp.model
 
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialResponse
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.emuapp.screens.AllScreens
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 
 class AuthModel: ViewModel() {
@@ -24,6 +30,40 @@ class AuthModel: ViewModel() {
         }else{
             _authStatus.value = CustomerStatus.UNAUTHENTICATED
         }
+    }
+
+    fun googleLogin(results:GetCredentialResponse){
+        when(val credential = results.credential){
+            is CustomCredential -> {
+                _authStatus.value = CustomerStatus.IsLoading
+                if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL){
+                    try {
+                        val googleIdToken = GoogleIdTokenCredential.createFrom(credential.data)
+                        val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken.idToken, null)
+
+                        auth.signInWithCredential(firebaseCredential).addOnCompleteListener {
+                            if (it.isSuccessful){
+                                _authStatus.value = CustomerStatus.AUTHENTICATED
+                            }else{
+                                _authStatus.value = CustomerStatus.ErrorLogin(message = it.exception?.message.toString())
+                            }
+                        }
+
+                    }catch (e: Exception){
+                        _authStatus.value = CustomerStatus.ErrorLogin(
+                            message = e.message.toString()
+                        )
+                    }
+                }
+            }
+            else ->{
+                _authStatus.value = CustomerStatus.ErrorLogin(
+                    message = "Unexpected type of credential."
+                )
+            }
+        }
+
+
     }
 
     fun login(email: String, password: String){
