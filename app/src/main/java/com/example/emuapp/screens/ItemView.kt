@@ -361,7 +361,12 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    onClick = {}) {
+                    onClick = {
+                        val itemsArray = ArrayList<Item>()
+                        itemsArray.add(item[0])
+                        navController.currentBackStackEntry?.savedStateHandle?.set("items", itemsArray)
+                        navController.navigate(AllScreens.Cart.route)
+                    }) {
                     Text(
                         text = "Buy Now",
                         style = MaterialTheme.typography.titleMedium

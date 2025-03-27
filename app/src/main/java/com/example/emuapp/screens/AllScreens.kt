@@ -11,5 +11,6 @@ sealed class AllScreens(val route: String) {
     data object Register: AllScreens("register")
     data object LogIn: AllScreens("log-in")
     data object Notifications: AllScreens("notifications")
+    data object Cart: AllScreens("Cart")
 
 }

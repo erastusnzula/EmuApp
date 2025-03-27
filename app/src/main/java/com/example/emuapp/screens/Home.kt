@@ -113,7 +113,6 @@ import kotlinx.coroutines.launch
 val allItems = apiCall()
 val allItemsByCategory = apiCallByCategory()
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun Home(navController: NavController, authModel: AuthModel) {

@@ -65,7 +65,7 @@ fun dataOffline():ArrayList<Item>{
         images = listOf("fdfj")
     )
     val allItems = ArrayList<Item>()
-    for (i in 1..100){
+    for (i in 1..3){
         allItems.add(itemSample)
     }
     return allItems

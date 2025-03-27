@@ -1,19 +1,23 @@
 package com.example.emuapp
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.emuapp.api.dataOffline
 import com.example.emuapp.data.Item
 import com.example.emuapp.model.AuthModel
 import com.example.emuapp.screens.AllScreens
+import com.example.emuapp.screens.Cart
 import com.example.emuapp.screens.Contact
 import com.example.emuapp.screens.FAQ
 import com.example.emuapp.screens.Home
@@ -89,6 +93,14 @@ fun AppNavigation(authModel:AuthModel){
         }
         composable(route=AllScreens.LogIn.route){
             LogIn(navController = navController,authModel=authModel)
+        }
+        composable(route=AllScreens.Cart.route){
+            navController.previousBackStackEntry?.savedStateHandle?.get<ArrayList<Item>>("items")
+                ?.let { it1 ->
+                    Cart(navController = navController,
+                        items = it1
+                    )
+                }
         }
     }
 

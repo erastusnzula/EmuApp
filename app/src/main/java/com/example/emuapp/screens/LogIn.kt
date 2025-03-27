@@ -84,7 +84,6 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun LogIn(navController: NavController, authModel: AuthModel) {
@@ -133,8 +132,6 @@ fun LogIn(navController: NavController, authModel: AuthModel) {
     Scaffold(
         containerColor = colorResource(R.color.white),
         modifier = Modifier
-
-
     ) {innerPadding->
         Column(
             verticalArrangement = Arrangement.Center,

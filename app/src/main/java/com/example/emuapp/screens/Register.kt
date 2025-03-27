@@ -86,7 +86,6 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun Register(navController: NavController, authModel: AuthModel) {
