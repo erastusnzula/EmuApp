@@ -1,6 +1,7 @@
 [versions]
 accompanistPermissions = "0.31.1-alpha"
 agp = "8.8.1"
+braintree = "4.0.0"
 coilCompose = "2.6.0"
 converterGson = "2.11.0"
 coreSplashscreen = "1.0.1"
@@ -33,6 +34,7 @@ androidx-credentials = { module = "androidx.credentials:credentials", version.re
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 androidx-material-icons-extended-android = { module = "androidx.compose.material:material-icons-extended-android", version.ref = "materialIconsExtendedAndroid" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+braintree = { module = "com.braintreepayments.api:braintree", version.ref = "braintree" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }

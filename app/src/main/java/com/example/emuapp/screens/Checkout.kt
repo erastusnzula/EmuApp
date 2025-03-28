@@ -1,5 +1,6 @@
 package com.example.emuapp.screens
 
+import android.widget.CheckBox
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,15 +23,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -41,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,21 +60,18 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
 import com.example.emuapp.api.dataOffline
-import com.example.emuapp.api.singleItemViewOffline
 import com.example.emuapp.components.getSubTotal
 import com.example.emuapp.components.getTotal
 import com.example.emuapp.components.getTotalDiscount
 import com.example.emuapp.data.InitialValues
-import com.example.emuapp.data.Item
 import com.example.emuapp.data.Sizes
 import com.example.emuapp.ui.theme.EmuAppTheme
 
-
 @Composable
-fun Cart(navController: NavController) {
-    val width = LocalConfiguration.current.screenWidthDp.dp
-    val height = LocalConfiguration.current.screenHeightDp.dp
-
+fun Checkout(navController: NavController) {
+    val isCheckedPaypal = remember { mutableStateOf(false) }
+    val isCheckedMpesa = remember { mutableStateOf(false) }
+    val isCheckedStripe = remember { mutableStateOf(false) }
     Scaffold(
         containerColor = colorResource(R.color.white)
     ) { innerPadding ->
@@ -100,7 +103,7 @@ fun Cart(navController: NavController) {
                     )
                 }
                 Text(
-                    text = "Cart",
+                    text = "Checkout",
                     fontSize = 20.sp,
                     color = colorResource(R.color.primary)
                 )
@@ -114,132 +117,36 @@ fun Cart(navController: NavController) {
             }
             Spacer(Modifier.height(10.dp))
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(Sizes.spacer),
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(height - 400.dp)
-
             ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = colorResource(R.color.primary)
+                        )
+                    }
+                    Text(
+                        text = "Nairobi, Kenya"
+                    )
 
-                items(items = InitialValues.cartItems.value,
-                    itemContent = {item->
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(height / 8)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(colorResource(R.color.primary).copy(.1f))
-
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .width(width / 2)
-                            ) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(item.thumbnail),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .width(100.dp)
-                                        .fillMaxHeight()
-                                        .clip(
-                                            RoundedCornerShape(
-                                                topStart = 8.dp,
-                                                bottomStart = 8.dp
-                                            )
-                                        )
-                                )
-                                Column(
-                                    verticalArrangement = Arrangement.SpaceBetween,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .fillMaxHeight()
-                                        .padding(start = 8.dp)
-                                ) {
-                                    Text(
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        text = item.title,
-                                        fontWeight = FontWeight.Medium,
-                                    )
-                                    Text(
-                                        text = item.category,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-
-                                        )
-                                    Text(
-                                        text = "$${item.price}",
-                                        color = colorResource(R.color.primary),
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                }
-
-                            }
-                            Column(
-                                horizontalAlignment = Alignment.End,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                            ) {
-                                IconButton(onClick = {
-                                    InitialValues.cartItems.value.remove(item)
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Default.DeleteForever,
-                                        contentDescription = null,
-                                        tint = Color.Red
-                                    )
-                                }
-                                Row(
-                                    horizontalArrangement = Arrangement.End,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                ) {
-                                    val quantity = remember { mutableIntStateOf(1) }
-                                    IconButton(onClick = {
-                                        if (quantity.intValue != 1) {
-                                            quantity.intValue -= 1
-                                        }else{
-                                            InitialValues.cartItems.value.remove(item)
-                                        }
-                                    }) {
-                                        Icon(
-                                            imageVector = Icons.Default.RemoveCircleOutline,
-                                            contentDescription = null,
-                                            tint = colorResource(R.color.primary)
-                                        )
-                                    }
-                                    TextField(
-                                        colors = TextFieldDefaults.colors(
-                                            focusedContainerColor = Color.Transparent,
-                                            unfocusedContainerColor = Color.Transparent,
-                                            unfocusedIndicatorColor = Color.Transparent
-                                        ),
-                                        modifier = Modifier
-                                            .width(40.dp),
-                                        value = quantity.intValue.toString(),
-                                        onValueChange = { quantity.intValue = it.toInt()}
-                                    )
-                                    IconButton(onClick = {
-                                        quantity.intValue +=1
-
-                                    }) {
-                                        Icon(
-                                            imageVector = Icons.Default.AddCircleOutline,
-                                            contentDescription = null,
-                                            tint = colorResource(R.color.primary)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    })
-
+                    TextButton(onClick = {}) {
+                        Text(
+                            text = "Change",
+                            color = colorResource(R.color.primary)
+                        )
+                    }
+                }
             }
 
+            Spacer(Modifier.height(10.dp))
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -249,7 +156,7 @@ fun Cart(navController: NavController) {
                     .padding(8.dp)
             ) {
                 Text(
-                    text = "Cart Summary",
+                    text = "Order Summary",
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(Modifier.height(10.dp))
@@ -326,21 +233,148 @@ fun Cart(navController: NavController) {
                     )
                 }
                 Spacer(Modifier.height(5.dp))
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(R.color.primary)
-                    ),
+
+
+            }
+            Spacer(Modifier.height(20.dp))
+
+            Column {
+                Text(
+                    text = "Choose payment method",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 20.sp
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    onClick = {
-                        navController.navigate(AllScreens.Checkout.route)
-                    }
+                        .fillMaxWidth()
                 ) {
-                    Text(
-                        text = "Checkout"
+                    Row {
+                        IconButton(onClick = {
+                            isCheckedMpesa.value = false
+                            isCheckedStripe.value = false
+                            isCheckedPaypal.value = true
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.paypal),
+                                contentDescription = null,
+                                tint = Color.Unspecified,
+                                modifier = Modifier
+                                    .size(50.dp)
+                            )
+                        }
+
+                        TextButton(onClick = {
+                            isCheckedMpesa.value = false
+                            isCheckedStripe.value = false
+                            isCheckedPaypal.value = true
+                        }) {
+                        Text(
+                            text = "PayPal"
+                        ) }
+                    }
+
+                    Checkbox(
+                        checked = isCheckedPaypal.value,
+                        onCheckedChange = {isCheckedPaypal.value = it},
+                        modifier = Modifier,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = colorResource(R.color.primary)
+                        )
                     )
                 }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row {
+                        IconButton(onClick = {
+                            isCheckedMpesa.value = true
+                            isCheckedStripe.value = false
+                            isCheckedPaypal.value = false
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Inbox,
+                                tint = colorResource(R.color.primary),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(50.dp)
+                            )
+                        }
 
+                        TextButton(onClick = {
+                            isCheckedMpesa.value = true
+                            isCheckedStripe.value = false
+                            isCheckedPaypal.value = false}) {
+                            Text(
+                                text = "M-Pesa"
+                            ) }
+                    }
+
+                    Checkbox(
+                        checked = isCheckedMpesa.value,
+                        onCheckedChange = {isCheckedMpesa.value = it},
+                        modifier = Modifier,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = colorResource(R.color.primary)
+                        )
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row {
+                        IconButton(onClick = {
+                            isCheckedMpesa.value = false
+                            isCheckedStripe.value = true
+                            isCheckedPaypal.value = false
+                        }) {
+                            Icon(
+                                painter = painterResource(R.drawable.stripe),
+                                contentDescription = null,
+                                tint = colorResource(R.color.primary),
+                                modifier = Modifier
+                                    .size(50.dp)
+                            )
+                        }
+
+                        TextButton(onClick = {
+                            isCheckedMpesa.value = false
+                            isCheckedStripe.value = true
+                            isCheckedPaypal.value = false
+                        }) {
+                            Text(
+                                text = "Stripe"
+                            ) }
+                    }
+
+                    Checkbox(
+                        checked = isCheckedStripe.value,
+                        onCheckedChange = {isCheckedStripe.value = it},
+                        modifier = Modifier,
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = colorResource(R.color.primary)
+                        )
+                    )
+                }
+            }
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.primary)
+                ),
+                enabled = isCheckedMpesa.value || isCheckedPaypal.value || isCheckedStripe.value,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                onClick = {}) {
+                Text(
+                    text = "Checkout"
+                )
             }
 
         }
@@ -351,10 +385,8 @@ fun Cart(navController: NavController) {
 
 @Preview(showBackground = true)
 @Composable
-fun CartPreview() {
+fun CheckoutPreview(){
     EmuAppTheme {
-        Cart(
-            navController = rememberNavController(),
-        )
+        Checkout(navController = rememberNavController())
     }
 }

@@ -1,5 +1,8 @@
 package com.example.emuapp.data
 
+import android.util.MutableInt
+import androidx.compose.runtime.MutableIntState
+
 data class ApiItems(
     val products: List<Item>
 )
@@ -48,4 +51,9 @@ data class Meta(
     val updatedAt: String,
     val barcode: String,
     val qrCode: String
+)
+
+data class ItemQuantity(
+    val item: Item,
+    var quantity:Int
 )

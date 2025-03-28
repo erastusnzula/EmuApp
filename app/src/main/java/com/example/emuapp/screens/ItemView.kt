@@ -29,7 +29,6 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +36,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -57,9 +57,9 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.emuapp.R
 import com.example.emuapp.api.singleItemViewOffline
 import com.example.emuapp.components.Review
-import com.example.emuapp.components.ZoomImage
 import com.example.emuapp.data.InitialValues
 import com.example.emuapp.data.Item
+import com.example.emuapp.data.ItemQuantity
 import com.example.emuapp.data.Sizes
 import com.example.emuapp.ui.theme.EmuAppTheme
 
@@ -67,6 +67,7 @@ import com.example.emuapp.ui.theme.EmuAppTheme
 fun ItemView(navController: NavController, item: ArrayList<Item>) {
     val imageUrl = remember { mutableStateOf(item[0].thumbnail) }
     val itemImagesUrl = remember {mutableStateOf("")}
+
     Scaffold(
         modifier = Modifier
 
@@ -362,9 +363,10 @@ fun ItemView(navController: NavController, item: ArrayList<Item>) {
                         .fillMaxWidth()
                         .padding(8.dp),
                     onClick = {
-                        val itemsArray = ArrayList<Item>()
-                        itemsArray.add(item[0])
-                        navController.currentBackStackEntry?.savedStateHandle?.set("items", itemsArray)
+                        val itemsArray = InitialValues.cartItems.value
+                        if (!itemsArray.contains(item[0])){
+                            itemsArray.add(item[0])
+                        }
                         navController.navigate(AllScreens.Cart.route)
                     }) {
                     Text(

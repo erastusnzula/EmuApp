@@ -18,6 +18,7 @@ import com.example.emuapp.data.Item
 import com.example.emuapp.model.AuthModel
 import com.example.emuapp.screens.AllScreens
 import com.example.emuapp.screens.Cart
+import com.example.emuapp.screens.Checkout
 import com.example.emuapp.screens.Contact
 import com.example.emuapp.screens.FAQ
 import com.example.emuapp.screens.Home
@@ -95,12 +96,11 @@ fun AppNavigation(authModel:AuthModel){
             LogIn(navController = navController,authModel=authModel)
         }
         composable(route=AllScreens.Cart.route){
-            navController.previousBackStackEntry?.savedStateHandle?.get<ArrayList<Item>>("items")
-                ?.let { it1 ->
-                    Cart(navController = navController,
-                        items = it1
-                    )
-                }
+                    Cart(navController = navController)
+
+        }
+        composable(route=AllScreens.Checkout.route){
+            Checkout(navController=navController)
         }
     }
 
