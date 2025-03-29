@@ -122,7 +122,7 @@ fun Cart(navController: NavController) {
 
             ) {
 
-                items(items = dataOffline(),//,
+                items(items = InitialValues.cartItems.value,
                     itemContent = {item->
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
