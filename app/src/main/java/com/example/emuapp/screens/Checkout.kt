@@ -1,6 +1,7 @@
 package com.example.emuapp.screens
 
 import android.widget.CheckBox
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +74,7 @@ fun Checkout(navController: NavController) {
     val isCheckedPaypal = remember { mutableStateOf(false) }
     val isCheckedMpesa = remember { mutableStateOf(false) }
     val isCheckedStripe = remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Scaffold(
         containerColor = colorResource(R.color.white)
     ) { innerPadding ->
@@ -197,8 +200,7 @@ fun Checkout(navController: NavController) {
                         text = "Discount"
                     )
                     Text(
-                        text = getTotalDiscount(InitialValues.cartItems.value).toString()
-                        ,
+                        text = getTotalDiscount(InitialValues.cartItems.value).toString(),
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -270,14 +272,21 @@ fun Checkout(navController: NavController) {
                             isCheckedStripe.value = false
                             isCheckedPaypal.value = true
                         }) {
-                        Text(
-                            text = "PayPal"
-                        ) }
+                            Text(
+                                text = "PayPal"
+                            )
+                        }
                     }
 
                     Checkbox(
                         checked = isCheckedPaypal.value,
-                        onCheckedChange = {isCheckedPaypal.value = it},
+                        onCheckedChange = {
+                            isCheckedPaypal.value = it
+                            if (isCheckedPaypal.value) {
+                                isCheckedMpesa.value = false
+                                isCheckedStripe.value = false
+                            }
+                        },
                         modifier = Modifier,
                         colors = CheckboxDefaults.colors(
                             checkedColor = colorResource(R.color.primary)
@@ -308,15 +317,23 @@ fun Checkout(navController: NavController) {
                         TextButton(onClick = {
                             isCheckedMpesa.value = true
                             isCheckedStripe.value = false
-                            isCheckedPaypal.value = false}) {
+                            isCheckedPaypal.value = false
+                        }) {
                             Text(
                                 text = "M-Pesa"
-                            ) }
+                            )
+                        }
                     }
 
                     Checkbox(
                         checked = isCheckedMpesa.value,
-                        onCheckedChange = {isCheckedMpesa.value = it},
+                        onCheckedChange = {
+                            isCheckedMpesa.value = it
+                            if (isCheckedMpesa.value) {
+                                isCheckedPaypal.value = false
+                                isCheckedStripe.value = false
+                            }
+                        },
                         modifier = Modifier,
                         colors = CheckboxDefaults.colors(
                             checkedColor = colorResource(R.color.primary)
@@ -351,12 +368,19 @@ fun Checkout(navController: NavController) {
                         }) {
                             Text(
                                 text = "Stripe"
-                            ) }
+                            )
+                        }
                     }
 
                     Checkbox(
                         checked = isCheckedStripe.value,
-                        onCheckedChange = {isCheckedStripe.value = it},
+                        onCheckedChange = {
+                            isCheckedStripe.value = it
+                            if (isCheckedStripe.value) {
+                                isCheckedMpesa.value = false
+                                isCheckedPaypal.value = false
+                            }
+                        },
                         modifier = Modifier,
                         colors = CheckboxDefaults.colors(
                             checkedColor = colorResource(R.color.primary)
@@ -371,7 +395,9 @@ fun Checkout(navController: NavController) {
                 enabled = isCheckedMpesa.value || isCheckedPaypal.value || isCheckedStripe.value,
                 modifier = Modifier
                     .fillMaxWidth(),
-                onClick = {}) {
+                onClick = {
+                    Toast.makeText(context, "Coming soon", Toast.LENGTH_LONG).show()
+                }) {
                 Text(
                     text = "Checkout"
                 )
@@ -385,7 +411,7 @@ fun Checkout(navController: NavController) {
 
 @Preview(showBackground = true)
 @Composable
-fun CheckoutPreview(){
+fun CheckoutPreview() {
     EmuAppTheme {
         Checkout(navController = rememberNavController())
     }

@@ -122,14 +122,14 @@ fun Cart(navController: NavController) {
 
             ) {
 
-                items(items = InitialValues.cartItems.value,
+                items(items = dataOffline(),//,
                     itemContent = {item->
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(height / 8)
+                                .height(height / 6)
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(colorResource(R.color.primary).copy(.1f))
 
@@ -219,7 +219,7 @@ fun Cart(navController: NavController) {
                                             unfocusedIndicatorColor = Color.Transparent
                                         ),
                                         modifier = Modifier
-                                            .width(40.dp),
+                                            .size(50.dp),
                                         value = quantity.intValue.toString(),
                                         onValueChange = { quantity.intValue = it.toInt()}
                                     )
