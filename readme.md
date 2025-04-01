@@ -2,6 +2,7 @@ This is an Android eCommerce application developed using Kotlin. The app provide
 
 Features
 --------
+```
 1. User Authentication: Sign up and login functionality with Firebase Authentication.
 
 2. Product Listing: Display products with images, descriptions, and prices.
@@ -15,6 +16,7 @@ Features
 6. Payment Integration: Integration with payment services like paypal and Stripe.
 
 7. Notifications: Receive updates.
+```
 
 Screenshots
 -----------
@@ -37,7 +39,9 @@ Landing Page & Item View
 
 Technologies Used
 ------------------
+```
 1. Kotlin: Primary language for Android development.
 2. Firebase: Authentication.
 3. Retrofit: For API calls (if needed for external APIs).
 4. Glide: For image loading.
+```
