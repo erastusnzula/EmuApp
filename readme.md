@@ -32,9 +32,9 @@ Login and Register
 Landing Page & Item View
 ----------
 <div style="display: flex; justify-content: space-between;">
-    <img src="murstech/home.png" alt="" width="200px" height="350px">
-    <img src="murstech/item_view_2.png" alt="" width="200px" height="350px">
-    <img src="murstech/item_view.png" alt="" width="200px" height="350px">
+    <img src="murstech/home.png" alt="" width="200px">
+    <img src="murstech/item_view_2.png" alt="" width="200px">
+    <img src="murstech/item_view.png" alt="" width="200px">
 </div>
 
 Technologies Used
