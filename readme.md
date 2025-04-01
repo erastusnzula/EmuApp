@@ -23,9 +23,11 @@ Screenshots
 
 Login and Register 
 ------------------
-<img src="murstech/login.png" alt="" width="200px" height="350px">
-<img src="murstech/login_google.png" alt="" width="200px" height="350px">
-<img src="murstech/register.png" alt="" width="200px" height="350px">
+<div style="display: flex; justify-content: space-around;">
+    <img src="murstech/login.png" alt="" width="200px" height="350px">
+    <img src="murstech/login_google.png" alt="" width="200px" height="350px">
+    <img src="murstech/register.png" alt="" width="200px" height="350px">
+</div>
 
 Landing Page & Item View
 ----------
