@@ -1,5 +1,3 @@
-MURSTECH
-========
 This is an Android eCommerce application developed using Kotlin. The app provides features like product browsing, adding items to cart, user authentication with firebase and payment integration. It is designed to provide users with a seamless shopping experience on Android devices.
 
 Features
