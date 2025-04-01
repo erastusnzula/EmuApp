@@ -23,7 +23,7 @@ Screenshots
 
 Login and Register 
 ------------------
-<div style="display: flex; justify-content: space-around;">
+<div style="display: flex; justify-content: space-between;">
     <img src="murstech/login.png" alt="" width="200px" height="350px">
     <img src="murstech/login_google.png" alt="" width="200px" height="350px">
     <img src="murstech/register.png" alt="" width="200px" height="350px">
@@ -31,9 +31,11 @@ Login and Register
 
 Landing Page & Item View
 ----------
-<img src="murstech/home.png" alt="" width="200px" height="350px">
-<img src="murstech/item_view_2.png" alt="" width="200px" height="350px">
-<img src="murstech/item_view.png" alt="" width="200px" height="350px">
+<div style="display: flex; justify-content: space-between;">
+    <img src="murstech/home.png" alt="" width="200px" height="350px">
+    <img src="murstech/item_view_2.png" alt="" width="200px" height="350px">
+    <img src="murstech/item_view.png" alt="" width="200px" height="350px">
+</div>
 
 Technologies Used
 ------------------
