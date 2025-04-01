@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "800969235949",
+    "project_id": "emuapp-a4903",
+    "storage_bucket": "emuapp-a4903.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800969235949:android:9d30fc0af0fa52f2f99be4",
+        "android_client_info": {
+          "package_name": "com.example.emuapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "800969235949-p5pk23ifitnnu7skicu76gr1kf1vfb73.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKiPUOMqBvVSc3SBVYTmJvn8OhmtTXR8A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "800969235949-p5pk23ifitnnu7skicu76gr1kf1vfb73.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
