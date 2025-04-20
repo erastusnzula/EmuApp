@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+.gitignore
+.idea
+./app/src/main/res/values/strings.xml
