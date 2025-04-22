@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "EmuApp"
 include(":app")
+include(":data")
